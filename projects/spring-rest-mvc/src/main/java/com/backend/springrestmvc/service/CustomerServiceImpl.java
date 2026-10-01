@@ -2,6 +2,7 @@ package com.backend.springrestmvc.service;
 
 import com.backend.springrestmvc.model.Customer;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -54,5 +55,19 @@ public class CustomerServiceImpl implements CustomerService {
     public Customer getCustomerById(UUID id) {
         log.debug("getCustomerById() - in customer service");
         return customerMap.get(id);
+    }
+
+    @Override
+    public Customer createCustomer(Customer customer) {
+        log.debug("createCustomer() - in customer service");
+        var newCustomer =  Customer.builder()
+                .id(UUID.randomUUID())
+                .name(customer.getName())
+                .version(0)
+                .createdDate(LocalDateTime.now())
+                .lastModifiedDate(LocalDateTime.now())
+                .build();
+        this.customerMap.put(newCustomer.getId(), newCustomer);
+        return newCustomer;
     }
 }
