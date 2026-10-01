@@ -60,6 +60,20 @@ public class BeerServiceImpl implements BeerService {
     }
 
     @Override
+    public void updateBeer(UUID id, Beer beer) {
+        log.debug("BeerController updateBeer beerId = " + id);
+        var existing = this.beerMap.get(id);
+        // No checking
+        existing.setBeerName(beer.getBeerName());
+        existing.setBeerStyle(beer.getBeerStyle());
+        existing.setUpc(beer.getUpc());
+        existing.setQuantityOnHand(beer.getQuantityOnHand());
+        existing.setPrice(beer.getPrice());
+        existing.setUpdatedAt(LocalDateTime.now());
+        this.beerMap.put(existing.getId(), existing);
+    }
+
+    @Override
     public List<Beer> getAllBeers() {
         log.debug("getAllBeers() - in beer service");
         return new ArrayList<>(beerMap.values());

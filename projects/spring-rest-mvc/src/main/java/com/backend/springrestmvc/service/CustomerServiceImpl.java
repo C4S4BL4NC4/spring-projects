@@ -2,7 +2,6 @@ package com.backend.springrestmvc.service;
 
 import com.backend.springrestmvc.model.Customer;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -69,5 +68,16 @@ public class CustomerServiceImpl implements CustomerService {
                 .build();
         this.customerMap.put(newCustomer.getId(), newCustomer);
         return newCustomer;
+    }
+
+    @Override
+    public void updateCustomer(UUID id, Customer customer) {
+        log.debug("updateCustomer() - in customer service");
+        var existing =  this.customerMap.get(id);
+        // Skip checking
+        existing.setName(customer.getName());
+        existing.setVersion(existing.getVersion() + 1);
+        existing.setLastModifiedDate(LocalDateTime.now());
+        this.customerMap.put(existing.getId(), existing);
     }
 }

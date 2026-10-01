@@ -18,6 +18,12 @@ import java.util.UUID;
 public class CustomerController {
     private final CustomerService customerService;
 
+    @PutMapping("/{customerId}")
+    public ResponseEntity<Customer> updateCustomer(@PathVariable UUID customerId, @RequestBody Customer customer) {
+        customerService.updateCustomer(customerId, customer);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
     @RequestMapping(method = RequestMethod.GET)
     public List<Customer> getAllCustomers() {
         log.debug("getAllCustomers() - in CustomerController");
