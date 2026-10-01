@@ -4,6 +4,7 @@ import com.backend.springrestmvc.model.Beer;
 import com.backend.springrestmvc.model.Customer;
 import com.backend.springrestmvc.service.CustomerService;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +15,7 @@ import java.util.UUID;
 
 @Slf4j
 @RestController
-@AllArgsConstructor
+@RequiredArgsConstructor
 @RequestMapping("/api/v0/customers")
 public class CustomerController {
     private final CustomerService customerService;

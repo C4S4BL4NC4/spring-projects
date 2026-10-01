@@ -3,6 +3,7 @@ package com.backend.springrestmvc.controller;
 import com.backend.springrestmvc.model.Beer;
 import com.backend.springrestmvc.service.BeerService;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -13,7 +14,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Slf4j
-@AllArgsConstructor
+@RequiredArgsConstructor
 @RestController     // Paired with @RequestBody for JSON returning purposes.
 //@Controller      // Can return any type of data used when to for example wanna render server sided HTML.
 @RequestMapping("/api/v0/beers")
