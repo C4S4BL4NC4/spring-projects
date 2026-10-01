@@ -80,4 +80,10 @@ public class CustomerServiceImpl implements CustomerService {
         existing.setLastModifiedDate(LocalDateTime.now());
         this.customerMap.put(existing.getId(), existing);
     }
+
+    @Override
+    public void deleteCustomer(UUID customerId) {
+        // Skip checking
+        this.customerMap.remove(customerId);
+    }
 }

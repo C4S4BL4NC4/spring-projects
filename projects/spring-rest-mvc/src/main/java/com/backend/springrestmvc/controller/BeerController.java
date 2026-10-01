@@ -20,9 +20,16 @@ import java.util.UUID;
 public class BeerController {
     private final BeerService beerService;
 
+    @DeleteMapping("/{beerId}")
+    public ResponseEntity<Beer> deleteBeer(@PathVariable("beerId") UUID beerId) {
+        log.debug("Deleting beer with id {}", beerId);
+        beerService.deleteBeer(beerId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
     @PutMapping("/{beerId}")
     public ResponseEntity<Beer> updateBeer(@PathVariable("beerId") UUID beerId,  @RequestBody Beer beer) {
-        log.info("BeerController updateBeer beerId = " + beerId);
+        log.debug("BeerController updateBeer beerId = " + beerId);
         beerService.updateBeer(beerId, beer);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
@@ -39,7 +46,7 @@ public class BeerController {
 
     @RequestMapping(method = RequestMethod.GET)
     public List<Beer> getAllBeers() {
-        log.info("getAllBeers() - in BeerController");
+        log.debug("getAllBeers() - in BeerController");
         return beerService.getAllBeers();
     }
 

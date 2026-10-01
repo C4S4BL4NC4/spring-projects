@@ -1,5 +1,6 @@
 package com.backend.springrestmvc.controller;
 
+import com.backend.springrestmvc.model.Beer;
 import com.backend.springrestmvc.model.Customer;
 import com.backend.springrestmvc.service.CustomerService;
 import lombok.AllArgsConstructor;
@@ -17,6 +18,13 @@ import java.util.UUID;
 @RequestMapping("/api/v0/customers")
 public class CustomerController {
     private final CustomerService customerService;
+
+    @DeleteMapping("/{customerId}")
+    public ResponseEntity<Customer> deleteBeer(@PathVariable("customerId") UUID customerId) {
+        log.debug("Deleting customer with id {}", customerId);
+        customerService.deleteCustomer(customerId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 
     @PutMapping("/{customerId}")
     public ResponseEntity<Customer> updateCustomer(@PathVariable UUID customerId, @RequestBody Customer customer) {
