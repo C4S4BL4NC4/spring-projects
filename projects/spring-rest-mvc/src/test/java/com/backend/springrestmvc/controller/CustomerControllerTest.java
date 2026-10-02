@@ -1,6 +1,5 @@
 package com.backend.springrestmvc.controller;
 
-import com.backend.springrestmvc.model.Beer;
 import com.backend.springrestmvc.model.Customer;
 import com.backend.springrestmvc.service.CustomerService;
 import com.backend.springrestmvc.service.CustomerServiceImpl;
@@ -41,8 +40,6 @@ class CustomerControllerTest {
 
     Customer customer;
 
-    String customersPath = "/api/v0/customers";
-
     @BeforeEach
     void setUp() {
         customerServiceImpl = new CustomerServiceImpl();
@@ -60,10 +57,10 @@ class CustomerControllerTest {
         Customer customer = customerServiceImpl.getAllCustomers().get(0);
 
         mockMvc.perform(
-                delete(
-                        customersPath + '/' + customer.getId()
-                ).accept(MediaType.APPLICATION_JSON)
-                        .contentType(MediaType.APPLICATION_JSON))
+                        delete(
+                                CustomerController.CUSTOMERS_PATH_ID, customer.getId().toString()
+                        ).accept(MediaType.APPLICATION_JSON)
+                                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
 
         ArgumentCaptor<UUID> uuidArgumentCaptor = ArgumentCaptor.forClass(UUID.class);
@@ -78,7 +75,7 @@ class CustomerControllerTest {
 
         mockMvc.perform(
                 put(
-                        customersPath + '/' + customer.getId()
+                        CustomerController.CUSTOMERS_PATH_ID, customer.getId().toString()
                 ).accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(customer))
@@ -94,7 +91,7 @@ class CustomerControllerTest {
 
         mockMvc.perform(
                         post(
-                                customersPath)
+                                CustomerController.CUSTOMERS_PATH)
                                 .accept(MediaType.APPLICATION_JSON)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(customer))
@@ -106,7 +103,10 @@ class CustomerControllerTest {
     void getAllCustomers() throws Exception {
         given(customerService.getAllCustomers()).willReturn(customerServiceImpl.getAllCustomers());
 
-        var result = mockMvc.perform(get(customersPath).accept(MediaType.APPLICATION_JSON))
+        var result = mockMvc.perform(
+                        get(
+                                CustomerController.CUSTOMERS_PATH
+                        ).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
@@ -122,7 +122,10 @@ class CustomerControllerTest {
         given(customerService.getCustomerById(customerId))
                 .willReturn(customer);
 
-        var result = mockMvc.perform(get(customersPath + '/' + customerId).accept(MediaType.APPLICATION_JSON))
+        var result = mockMvc.perform(
+                        get(
+                                CustomerController.CUSTOMERS_PATH_ID, customer.getId().toString()
+                        ).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();

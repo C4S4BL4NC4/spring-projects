@@ -1,9 +1,7 @@
 package com.backend.springrestmvc.controller;
 
-import com.backend.springrestmvc.model.Beer;
 import com.backend.springrestmvc.model.Customer;
 import com.backend.springrestmvc.service.CustomerService;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -16,36 +14,40 @@ import java.util.UUID;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v0/customers")
 public class CustomerController {
+
+    public static final String CUSTOMERS_PATH = "/api/v0/customers";
+    public static final String CUSTOMERS_PATH_ID = CUSTOMERS_PATH + '/' + "{customerId}";
+
+
     private final CustomerService customerService;
 
-    @DeleteMapping("/{customerId}")
+    @DeleteMapping(CUSTOMERS_PATH_ID)
     public ResponseEntity<Customer> deleteBeer(@PathVariable("customerId") UUID customerId) {
         log.debug("Deleting customer with id {}", customerId);
         customerService.deleteCustomer(customerId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PutMapping("/{customerId}")
+    @PutMapping(CUSTOMERS_PATH_ID)
     public ResponseEntity<Customer> updateCustomer(@PathVariable UUID customerId, @RequestBody Customer customer) {
         customerService.updateCustomer(customerId, customer);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @RequestMapping(method = RequestMethod.GET)
+    @GetMapping(CUSTOMERS_PATH)
     public List<Customer> getAllCustomers() {
         log.debug("getAllCustomers() - in CustomerController");
         return customerService.getAllCustomers();
     }
 
-    @RequestMapping(value = "/{customerId}", method = RequestMethod.GET)
+    @GetMapping(CUSTOMERS_PATH_ID)
     public Customer getCustomerById(@PathVariable("customerId") UUID customerId) {
         log.debug("getCustomerById() - in CustomerController");
         return customerService.getCustomerById(customerId);
     }
 
-    @PostMapping
+    @PostMapping(CUSTOMERS_PATH)
     public ResponseEntity<Customer> createCustomer(@RequestBody Customer customer) {
         log.debug("createCustomer() - in CustomerController");
         var savedCustomer = customerService.createCustomer(customer);

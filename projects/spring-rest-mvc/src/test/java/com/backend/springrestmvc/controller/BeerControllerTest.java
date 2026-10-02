@@ -2,7 +2,6 @@ package com.backend.springrestmvc.controller;
 
 import com.backend.springrestmvc.model.Beer;
 import com.backend.springrestmvc.model.BeerStyle;
-import com.backend.springrestmvc.model.Customer;
 import com.backend.springrestmvc.service.BeerService;
 import com.backend.springrestmvc.service.BeerServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -67,7 +66,7 @@ class BeerControllerTest {
 
         mockMvc.perform(
                         delete(
-                                beersPath + '/' + beer.getId()
+                                BeerController.BEERS_PATH_ID, beer.getId().toString()
                         ).accept(MediaType.APPLICATION_JSON)
                                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
@@ -83,7 +82,7 @@ class BeerControllerTest {
         given(beerService.saveNewBeer(any(Beer.class))).willReturn(beer);
 
         mockMvc.perform(
-                        post(beersPath)
+                        post(BeerController.BEERS_PATH)
                                 .accept(MediaType.APPLICATION_JSON)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(beer))
@@ -97,7 +96,7 @@ class BeerControllerTest {
 
         mockMvc.perform(
                 put(
-                        beersPath + '/' + beer.getId()
+                        BeerController.BEERS_PATH_ID, beer.getId().toString()
                 ).accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(beer))
@@ -111,7 +110,7 @@ class BeerControllerTest {
         given(beerService.getAllBeers()).willReturn(beerServiceImpl.getAllBeers());
 
         mockMvc.perform(
-                        get(beersPath)
+                        get(BeerController.BEERS_PATH)
                                 .accept(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().isOk())
@@ -127,7 +126,7 @@ class BeerControllerTest {
         given(beerService.getBeerById(beerId))
                 .willReturn(beer);
 
-        var result = mockMvc.perform(get(beersPath + '/' + beerId)
+        var result = mockMvc.perform(get(BeerController.BEERS_PATH_ID, beer.getId().toString())
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
