@@ -3,18 +3,22 @@ package com.backend.springrestmvc.controller;
 import com.backend.springrestmvc.model.Customer;
 import com.backend.springrestmvc.service.CustomerService;
 import com.backend.springrestmvc.service.CustomerServiceImpl;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import tools.jackson.databind.ObjectMapper;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -24,16 +28,50 @@ class CustomerControllerTest {
     @Autowired
     MockMvc mockMvc;
 
+    @Autowired
+    ObjectMapper objectMapper;
+
     @MockitoBean
     CustomerService customerService;
 
-    CustomerServiceImpl customerServiceImpl = new CustomerServiceImpl();
+    CustomerServiceImpl customerServiceImpl;
+
+    Customer customer;
+
+    String customersPath = "/api/v0/customers";
+
+    @BeforeEach
+    void setUp() {
+        customerServiceImpl = new CustomerServiceImpl();
+
+        customer = Customer.builder()
+                .id(UUID.randomUUID())
+                .version(0)
+                .name("Bill Murray")
+                .createdDate(LocalDateTime.now())
+                .build();
+    }
+
+    @Test
+    void createCustomer() throws Exception {
+
+        given(customerService.createCustomer(any(Customer.class))).willReturn(customer);
+
+        mockMvc.perform(
+                        post(
+                                customersPath)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(customer))
+                )
+                .andExpect(status().isCreated());
+    }
 
     @Test
     void getAllCustomers() throws Exception {
         given(customerService.getAllCustomers()).willReturn(customerServiceImpl.getAllCustomers());
 
-        var result = mockMvc.perform(get("/api/v0/customers").accept(MediaType.APPLICATION_JSON))
+        var result = mockMvc.perform(get(customersPath).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
@@ -44,20 +82,12 @@ class CustomerControllerTest {
     @Test
     void getCustomerById() throws Exception {
 
-        var testCustomer = Customer.builder()
-                .id(UUID.randomUUID())
-                .name("Ibrahim Tatlises")
-                .version(0)
-                .createdDate(LocalDateTime.now().minusDays(60))
-                .lastModifiedDate(LocalDateTime.now().minusDays(2))
-                .build();
-
-        var customerId = testCustomer.getId();
+        var customerId = customer.getId();
 
         given(customerService.getCustomerById(customerId))
-                .willReturn(testCustomer);
+                .willReturn(customer);
 
-        var result = mockMvc.perform(get("/api/v0/customers/" + customerId).accept(MediaType.APPLICATION_JSON))
+        var result = mockMvc.perform(get(customersPath + '/' + customerId).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();

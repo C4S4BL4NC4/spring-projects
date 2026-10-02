@@ -4,20 +4,24 @@ import com.backend.springrestmvc.model.Beer;
 import com.backend.springrestmvc.model.BeerStyle;
 import com.backend.springrestmvc.service.BeerService;
 import com.backend.springrestmvc.service.BeerServiceImpl;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import tools.jackson.databind.ObjectMapper;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.hamcrest.core.Is.is;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(BeerController.class)
@@ -26,17 +30,54 @@ class BeerControllerTest {
     @Autowired
     MockMvc mockMvc;
 
+    @Autowired
+    ObjectMapper objectMapper;
+
     @MockitoBean
     BeerService beerService;
 
-    BeerServiceImpl beerServiceImpl = new BeerServiceImpl();
+    BeerServiceImpl beerServiceImpl;
+
+    Beer beer;
+
+    String beersPath = "/api/v0/beers";
+
+    @BeforeEach
+    void setUp() {
+        beerServiceImpl = new BeerServiceImpl();
+
+        beer = Beer.builder()
+                .id(UUID.randomUUID())
+                .beerName("Guinness")
+                .beerStyle(BeerStyle.STOUT)
+                .quantityOnHand(20)
+                .price(BigDecimal.valueOf(150.00))
+                .createdAt(LocalDateTime.now())
+                .version(0)
+                .upc("555555")
+                .build();
+    }
+
+    @Test
+    void createBeer() throws Exception {
+
+        given(beerService.saveNewBeer(any(Beer.class))).willReturn(beer);
+
+        mockMvc.perform(
+                        post(beersPath)
+                                .accept(MediaType.APPLICATION_JSON)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(beer))
+                ).andExpect(status().isCreated())
+                .andExpect(header().exists("Location"));
+    }
 
     @Test
     void getBeers() throws Exception {
         given(beerService.getAllBeers()).willReturn(beerServiceImpl.getAllBeers());
 
         mockMvc.perform(
-                        get("/api/v0/beers")
+                        get(beersPath)
                                 .accept(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().isOk())
@@ -47,29 +88,17 @@ class BeerControllerTest {
     @Test
     void getBeerById() throws Exception {
 
-        Beer testBeer = Beer.builder()
-                .id(UUID.randomUUID())
-                .version(1)
-                .beerName("EFES")
-                .beerStyle(BeerStyle.MALT)
-                .upc("222222")
-                .quantityOnHand(110)
-                .price(BigDecimal.valueOf(120.00))
-                .createdAt(LocalDateTime.now().minusDays(3))
-                .updatedAt(LocalDateTime.now().minusMinutes(20))
-                .build();
-
-        UUID beerId = testBeer.getId();
+        UUID beerId = beer.getId();
 
         given(beerService.getBeerById(beerId))
-                .willReturn(testBeer);
+                .willReturn(beer);
 
-        var result = mockMvc.perform(get("/api/v0/beers/" + beerId)
+        var result = mockMvc.perform(get(beersPath + '/' + beerId)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id", is(testBeer.getId().toString())))
-                .andExpect(jsonPath("$.beerName", is(testBeer.getBeerName().toString())))
+                .andExpect(jsonPath("$.id", is(beer.getId().toString())))
+                .andExpect(jsonPath("$.beerName", is(beer.getBeerName().toString())))
                 .andReturn();
 
         System.out.println(result.getResponse().getContentAsString());
