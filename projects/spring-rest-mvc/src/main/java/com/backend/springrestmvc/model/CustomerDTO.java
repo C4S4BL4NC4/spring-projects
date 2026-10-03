@@ -10,7 +10,7 @@ import java.util.UUID;
 @Builder
 @Data
 @AllArgsConstructor
-public class Customer {
+public class CustomerDTO {
     private UUID id;
     private String name;
     private Integer version;

@@ -1,6 +1,6 @@
 package com.backend.springrestmvc.service;
 
-import com.backend.springrestmvc.model.Customer;
+import com.backend.springrestmvc.model.CustomerDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -11,19 +11,19 @@ import java.util.*;
 @Service
 public class CustomerServiceImpl implements CustomerService {
 
-    private final Map<UUID, Customer> customerMap;
+    private final Map<UUID, CustomerDTO> customerMap;
 
     public CustomerServiceImpl() {
         this.customerMap = new HashMap<>();
 
-        var riri = Customer.builder()
+        var riri = CustomerDTO.builder()
                 .id(UUID.randomUUID())
                 .name("Riki Maro")
                 .version(0)
                 .createdDate(LocalDateTime.now().minusDays(30))
                 .lastModifiedDate(LocalDateTime.now().minusHours(30))
                 .build();
-        var ibra = Customer.builder()
+        var ibra = CustomerDTO.builder()
                 .id(UUID.randomUUID())
                 .name("Ibrahim Tatlises")
                 .version(0)
@@ -31,7 +31,7 @@ public class CustomerServiceImpl implements CustomerService {
                 .lastModifiedDate(LocalDateTime.now().minusDays(2))
                 .build();
 
-        var carm = Customer.builder()
+        var carm = CustomerDTO.builder()
                 .id(UUID.randomUUID())
                 .name("Carmine Berzatto")
                 .version(0)
@@ -45,23 +45,23 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public List<Customer> getAllCustomers() {
+    public List<CustomerDTO> getAllCustomers() {
         log.debug("getAllCustomers() -  in customer service");
         return new ArrayList<>(this.customerMap.values());
     }
 
     @Override
-    public Optional<Customer> getCustomerById(UUID id) {
+    public Optional<CustomerDTO> getCustomerById(UUID id) {
         log.debug("getCustomerById() - in customer service");
         return Optional.of(customerMap.get(id));
     }
 
     @Override
-    public Customer createCustomer(Customer customer) {
-        log.debug("createCustomer() - in customer service");
-        var newCustomer = Customer.builder()
+    public CustomerDTO createCustomer(CustomerDTO customerDTO) {
+        log.debug("createCustomer() - in customerDTO service");
+        var newCustomer = CustomerDTO.builder()
                 .id(UUID.randomUUID())
-                .name(customer.getName())
+                .name(customerDTO.getName())
                 .version(0)
                 .createdDate(LocalDateTime.now())
                 .lastModifiedDate(LocalDateTime.now())
@@ -71,11 +71,11 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public void updateCustomer(UUID id, Customer customer) {
-        log.debug("updateCustomer() - in customer service");
+    public void updateCustomer(UUID id, CustomerDTO customerDTO) {
+        log.debug("updateCustomer() - in customerDTO service");
         var existing = this.customerMap.get(id);
         // Skip checking
-        existing.setName(customer.getName());
+        existing.setName(customerDTO.getName());
         existing.setVersion(existing.getVersion() + 1);
         existing.setLastModifiedDate(LocalDateTime.now());
         this.customerMap.put(existing.getId(), existing);

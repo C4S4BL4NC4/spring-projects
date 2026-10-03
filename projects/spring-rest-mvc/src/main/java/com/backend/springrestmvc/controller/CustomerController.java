@@ -1,7 +1,7 @@
 package com.backend.springrestmvc.controller;
 
 import com.backend.springrestmvc.exception.NotFoundException;
-import com.backend.springrestmvc.model.Customer;
+import com.backend.springrestmvc.model.CustomerDTO;
 import com.backend.springrestmvc.service.CustomerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,34 +24,34 @@ public class CustomerController {
     private final CustomerService customerService;
 
     @DeleteMapping(CUSTOMERS_PATH_ID)
-    public ResponseEntity<Customer> deleteBeer(@PathVariable("customerId") UUID customerId) {
+    public ResponseEntity<CustomerDTO> deleteBeer(@PathVariable("customerId") UUID customerId) {
         log.debug("Deleting customer with id {}", customerId);
         customerService.deleteCustomer(customerId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PutMapping(CUSTOMERS_PATH_ID)
-    public ResponseEntity<Customer> updateCustomer(@PathVariable UUID customerId, @RequestBody Customer customer) {
-        customerService.updateCustomer(customerId, customer);
+    public ResponseEntity<CustomerDTO> updateCustomer(@PathVariable UUID customerId, @RequestBody CustomerDTO customerDTO) {
+        customerService.updateCustomer(customerId, customerDTO);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @GetMapping(CUSTOMERS_PATH)
-    public List<Customer> getAllCustomers() {
+    public List<CustomerDTO> getAllCustomers() {
         log.debug("getAllCustomers() - in CustomerController");
         return customerService.getAllCustomers();
     }
 
     @GetMapping(CUSTOMERS_PATH_ID)
-    public Customer getCustomerById(@PathVariable("customerId") UUID customerId) {
+    public CustomerDTO getCustomerById(@PathVariable("customerId") UUID customerId) {
         log.debug("getCustomerById() - in CustomerController");
         return customerService.getCustomerById(customerId).orElseThrow(NotFoundException::new);
     }
 
     @PostMapping(CUSTOMERS_PATH)
-    public ResponseEntity<Customer> createCustomer(@RequestBody Customer customer) {
+    public ResponseEntity<CustomerDTO> createCustomer(@RequestBody CustomerDTO customerDTO) {
         log.debug("createCustomer() - in CustomerController");
-        var savedCustomer = customerService.createCustomer(customer);
+        var savedCustomer = customerService.createCustomer(customerDTO);
         return new ResponseEntity<>(savedCustomer, HttpStatus.CREATED);
     }
 }

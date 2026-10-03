@@ -1,6 +1,6 @@
 package com.backend.springrestmvc.controller;
 
-import com.backend.springrestmvc.model.Customer;
+import com.backend.springrestmvc.model.CustomerDTO;
 import com.backend.springrestmvc.service.CustomerService;
 import com.backend.springrestmvc.service.CustomerServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,13 +39,13 @@ class CustomerControllerTest {
 
     CustomerServiceImpl customerServiceImpl;
 
-    Customer customer;
+    CustomerDTO customerDTO;
 
     @BeforeEach
     void setUp() {
         customerServiceImpl = new CustomerServiceImpl();
 
-        customer = Customer.builder()
+        customerDTO = CustomerDTO.builder()
                 .id(UUID.randomUUID())
                 .version(0)
                 .name("Bill Murray")
@@ -55,47 +55,47 @@ class CustomerControllerTest {
 
     @Test
     void deleteCustomer() throws Exception {
-        Customer customer = customerServiceImpl.getAllCustomers().get(0);
+        CustomerDTO customerDTO = customerServiceImpl.getAllCustomers().get(0);
 
         mockMvc.perform(
                         delete(
-                                CustomerController.CUSTOMERS_PATH_ID, customer.getId().toString()
+                                CustomerController.CUSTOMERS_PATH_ID, customerDTO.getId().toString()
                         ).accept(MediaType.APPLICATION_JSON)
                                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
 
         ArgumentCaptor<UUID> uuidArgumentCaptor = ArgumentCaptor.forClass(UUID.class);
         verify(customerService).deleteCustomer(uuidArgumentCaptor.capture());
-        assertThat(customer.getId()).isEqualTo(uuidArgumentCaptor.getValue());
+        assertThat(customerDTO.getId()).isEqualTo(uuidArgumentCaptor.getValue());
 
     }
 
     @Test
     void updateCustomer() throws Exception {
-        Customer customer = customerServiceImpl.getAllCustomers().get(0);
+        CustomerDTO customerDTO = customerServiceImpl.getAllCustomers().get(0);
 
         mockMvc.perform(
                 put(
-                        CustomerController.CUSTOMERS_PATH_ID, customer.getId().toString()
+                        CustomerController.CUSTOMERS_PATH_ID, customerDTO.getId().toString()
                 ).accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(customer))
+                        .content(objectMapper.writeValueAsString(customerDTO))
         ).andExpect(status().isNoContent());
 
-        verify(customerService).updateCustomer(any(UUID.class), any(Customer.class));
+        verify(customerService).updateCustomer(any(UUID.class), any(CustomerDTO.class));
     }
 
     @Test
     void createCustomer() throws Exception {
 
-        given(customerService.createCustomer(any(Customer.class))).willReturn(customer);
+        given(customerService.createCustomer(any(CustomerDTO.class))).willReturn(customerDTO);
 
         mockMvc.perform(
                         post(
                                 CustomerController.CUSTOMERS_PATH)
                                 .accept(MediaType.APPLICATION_JSON)
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(customer))
+                                .content(objectMapper.writeValueAsString(customerDTO))
                 )
                 .andExpect(status().isCreated());
     }
@@ -118,14 +118,14 @@ class CustomerControllerTest {
     @Test
     void getCustomerById() throws Exception {
 
-        var customerId = customer.getId();
+        var customerId = customerDTO.getId();
 
         given(customerService.getCustomerById(customerId))
-                .willReturn(Optional.ofNullable(customer));
+                .willReturn(Optional.ofNullable(customerDTO));
 
         var result = mockMvc.perform(
                         get(
-                                CustomerController.CUSTOMERS_PATH_ID, customer.getId().toString()
+                                CustomerController.CUSTOMERS_PATH_ID, customerDTO.getId().toString()
                         ).accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
