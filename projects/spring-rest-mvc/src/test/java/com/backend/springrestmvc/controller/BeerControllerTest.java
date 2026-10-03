@@ -16,6 +16,7 @@ import tools.jackson.databind.ObjectMapper;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -58,6 +59,15 @@ class BeerControllerTest {
                 .version(0)
                 .upc("555555")
                 .build();
+    }
+
+    @Test
+    void getBeerIdNotFound() throws Exception {
+
+        given(beerService.getBeerById(any())).willReturn(Optional.empty());
+
+        mockMvc.perform(get(BeerController.BEERS_PATH_ID, UUID.randomUUID()))
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -124,7 +134,7 @@ class BeerControllerTest {
         UUID beerId = beer.getId();
 
         given(beerService.getBeerById(beerId))
-                .willReturn(beer);
+                .willReturn(Optional.of(beer));
 
         var result = mockMvc.perform(get(BeerController.BEERS_PATH_ID, beer.getId().toString())
                         .accept(MediaType.APPLICATION_JSON))

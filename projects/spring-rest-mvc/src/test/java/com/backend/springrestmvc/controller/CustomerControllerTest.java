@@ -14,6 +14,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import tools.jackson.databind.ObjectMapper;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -120,7 +121,7 @@ class CustomerControllerTest {
         var customerId = customer.getId();
 
         given(customerService.getCustomerById(customerId))
-                .willReturn(customer);
+                .willReturn(Optional.ofNullable(customer));
 
         var result = mockMvc.perform(
                         get(
@@ -129,5 +130,14 @@ class CustomerControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
+    }
+
+    @Test
+    void getCustomerIdNotFound() throws Exception {
+
+        given(customerService.getCustomerById(any())).willReturn(Optional.empty());
+
+        mockMvc.perform(get(CustomerController.CUSTOMERS_PATH_ID, UUID.randomUUID()))
+                .andExpect(status().isNotFound());
     }
 }

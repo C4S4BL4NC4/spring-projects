@@ -51,15 +51,15 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public Customer getCustomerById(UUID id) {
+    public Optional<Customer> getCustomerById(UUID id) {
         log.debug("getCustomerById() - in customer service");
-        return customerMap.get(id);
+        return Optional.of(customerMap.get(id));
     }
 
     @Override
     public Customer createCustomer(Customer customer) {
         log.debug("createCustomer() - in customer service");
-        var newCustomer =  Customer.builder()
+        var newCustomer = Customer.builder()
                 .id(UUID.randomUUID())
                 .name(customer.getName())
                 .version(0)
@@ -73,7 +73,7 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public void updateCustomer(UUID id, Customer customer) {
         log.debug("updateCustomer() - in customer service");
-        var existing =  this.customerMap.get(id);
+        var existing = this.customerMap.get(id);
         // Skip checking
         existing.setName(customer.getName());
         existing.setVersion(existing.getVersion() + 1);

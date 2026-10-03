@@ -1,5 +1,6 @@
 package com.backend.springrestmvc.controller;
 
+import com.backend.springrestmvc.exception.NotFoundException;
 import com.backend.springrestmvc.model.Beer;
 import com.backend.springrestmvc.service.BeerService;
 import lombok.RequiredArgsConstructor;
@@ -58,6 +59,11 @@ public class BeerController {
     @GetMapping(BEERS_PATH_ID)
     public Beer getBeerById(@PathVariable("beerId") UUID beerId) {
         log.debug("getBeerById() - in BeerController");
-        return beerService.getBeerById(beerId);
+        return beerService.getBeerById(beerId).orElseThrow(NotFoundException::new);
     }
+
+//    @ExceptionHandler(NotFoundException.class)
+//    public ResponseEntity handleNotFoundException(Exception exception) {
+//        return ResponseEntity.notFound().build();
+//    }
 }
