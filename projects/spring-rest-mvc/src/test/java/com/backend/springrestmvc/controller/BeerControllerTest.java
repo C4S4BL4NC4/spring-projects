@@ -43,7 +43,6 @@ class BeerControllerTest {
 
     BeerDTO beerDTO;
 
-    String beersPath = "/api/v0/beers";
 
     @BeforeEach
     void setUp() {
@@ -102,7 +101,8 @@ class BeerControllerTest {
 
     @Test
     void updateBeer() throws Exception {
-        BeerDTO beerDTO = beerServiceImpl.getAllBeers().get(0);
+        BeerDTO beerDTO = beerServiceImpl.getAllBeers().getFirst();
+        given(beerService.updateBeer(any(UUID.class), any(BeerDTO.class))).willReturn(Optional.of(beerDTO));
 
         mockMvc.perform(
                 put(
@@ -141,7 +141,7 @@ class BeerControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id", is(beerDTO.getId().toString())))
-                .andExpect(jsonPath("$.beerName", is(beerDTO.getBeerName().toString())))
+                .andExpect(jsonPath("$.beerName", is(beerDTO.getBeerName())))
                 .andReturn();
 
         System.out.println(result.getResponse().getContentAsString());

@@ -1,15 +1,21 @@
 package com.backend.springrestmvc.controller;
 
+import com.backend.springrestmvc.entity.Beer;
+import com.backend.springrestmvc.exception.NotFoundException;
+import com.backend.springrestmvc.mapper.BeerMapper;
+import com.backend.springrestmvc.model.BeerDTO;
 import com.backend.springrestmvc.repository.BeerRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.repository.core.support.RepositoryMethodInvocationListener;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 class BeerControllerIT {
@@ -18,7 +24,21 @@ class BeerControllerIT {
 
     @Autowired
     BeerRepository beerRepository;
-    private RepositoryMethodInvocationListener repositoryMethodInvocationListener;
+
+    @Autowired
+    BeerMapper beerMapper;
+
+    @Test
+    void beerByIdNotFound() {
+        assertThrows(NotFoundException.class, () -> beerController.getBeerById(UUID.randomUUID()));
+    }
+
+    @Test
+    void getBeerById() {
+        Beer beer = beerRepository.findAll().get(0);
+        BeerDTO beerDTO = beerController.getBeerById(beer.getId());
+        assertThat(beerDTO).isNotNull();
+    }
 
     @Test
     void getAllBeers() {
@@ -33,6 +53,45 @@ class BeerControllerIT {
         beerRepository.deleteAll();
         var dtos = beerController.getAllBeers();
         assertThat(dtos.size()).isEqualTo(0);
+    }
 
+    @Rollback
+    @Transactional
+    @Test
+    void saveNewBeer() {
+        var dto = BeerDTO.builder().beerName("Budweiser").build();
+        var responseEntity = beerController.createBeer(dto);
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        assertThat(responseEntity.getHeaders().getLocation()).isNotNull();
+        var uuid = UUID.fromString(
+                responseEntity
+                        .getHeaders()
+                        .getLocation()
+                        .getPath()
+                        .split("/")[4]
+        );
+        var beer = beerRepository.findById(uuid);
+        assertThat(beer).isNotNull();
+    }
+
+    @Rollback
+    @Transactional
+    @Test
+    void updateBeer() {
+        var beer = beerRepository.findAll().getFirst();
+        var dto = BeerDTO.builder().id(null).version(null).beerName("Budweiser").build();
+        var responseEntity = beerController.updateBeer(beer.getId(), dto);
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+        assertThat(beer.getBeerName()).isEqualTo("Budweiser");
+    }
+
+    @Test
+    void updateBeerNotFound() {
+        BeerDTO dto = beerMapper.beerToBeerDTO(beerRepository.findAll().getFirst());
+        dto.setId(null);
+        dto.setVersion(null);
+        dto.setBeerName("Budweiser");
+
+        assertThrows(NotFoundException.class, () -> beerController.updateBeer(UUID.randomUUID(), dto));
     }
 }

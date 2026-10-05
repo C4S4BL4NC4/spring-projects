@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -38,12 +39,20 @@ public class BeerServiceJPA implements BeerService {
 
     @Override
     public BeerDTO saveNewBeer(BeerDTO beerDTO) {
-        return null;
+        return beerMapper.beerToBeerDTO(beerRepository.save(beerMapper.beerDTOToBeer(beerDTO)));
     }
 
     @Override
-    public void updateBeer(UUID id, BeerDTO beerDTO) {
-
+    public Optional<BeerDTO> updateBeer(UUID id, BeerDTO beerDTO) {
+        return beerRepository.findById(id).map(beer -> {
+            beer.setBeerName(beerDTO.getBeerName());
+            beer.setBeerStyle(beerDTO.getBeerStyle());
+            beer.setQuantityOnHand(beerDTO.getQuantityOnHand());
+            beer.setPrice(beerDTO.getPrice());
+            beer.setUpc(beerDTO.getUpc());
+            beer.setUpdatedAt(LocalDateTime.now());
+            return beerMapper.beerToBeerDTO(beerRepository.save(beer));
+        });
     }
 
     @Override
