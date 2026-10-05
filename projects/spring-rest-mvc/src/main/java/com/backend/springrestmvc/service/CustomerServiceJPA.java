@@ -17,7 +17,6 @@ import java.util.UUID;
 public class CustomerServiceJPA implements CustomerService {
 
     private final CustomerRepository customerRepository;
-
     private final CustomerMapper customerMapper;
 
     @Override
@@ -41,7 +40,7 @@ public class CustomerServiceJPA implements CustomerService {
     }
 
     @Override
-    public void deleteCustomer(UUID customerId) {
+    public void deleteCustomer(UUID id) {
 
     }
 }

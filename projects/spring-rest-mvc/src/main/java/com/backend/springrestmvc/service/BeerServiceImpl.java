@@ -13,11 +13,9 @@ import java.util.*;
 @Service
 public class BeerServiceImpl implements BeerService {
 
-    private final Map<UUID, BeerDTO> beerMap;
+    private final Map<UUID, BeerDTO> beerMap = new HashMap<>();
 
     public BeerServiceImpl() {
-        this.beerMap = new HashMap<>();
-
         var efesMalt = BeerDTO.builder()
                 .id(UUID.randomUUID())
                 .version(1)
@@ -60,20 +58,6 @@ public class BeerServiceImpl implements BeerService {
     }
 
     @Override
-    public void updateBeer(UUID id, BeerDTO beerDTO) {
-        log.debug("BeerController updateBeer beerId = " + id);
-        var existing = this.beerMap.get(id);
-        // No checking
-        existing.setBeerName(beerDTO.getBeerName());
-        existing.setBeerStyle(beerDTO.getBeerStyle());
-        existing.setUpc(beerDTO.getUpc());
-        existing.setQuantityOnHand(beerDTO.getQuantityOnHand());
-        existing.setPrice(beerDTO.getPrice());
-        existing.setUpdatedAt(LocalDateTime.now());
-        this.beerMap.put(existing.getId(), existing);
-    }
-
-    @Override
     public List<BeerDTO> getAllBeers() {
         log.debug("getAllBeers() - in beer service");
         return new ArrayList<>(beerMap.values());
@@ -81,31 +65,45 @@ public class BeerServiceImpl implements BeerService {
 
     @Override
     public Optional<BeerDTO> getBeerById(UUID id) {
-        log.debug("getBeerById() - in beer service");
-        return Optional.of(beerMap.get(id));
+        log.debug("getBeerById() - in beer service, id = {}", id);
+        return Optional.ofNullable(beerMap.get(id));
     }
 
     @Override
     public BeerDTO saveNewBeer(BeerDTO beerDTO) {
-        log.debug("saveNewBeer() - in beerDTO service");
+        log.debug("saveNewBeer() - in beer service");
+        var now = LocalDateTime.now();
         var newBeer = BeerDTO.builder()
                 .id(UUID.randomUUID())
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
                 .version(0)
                 .beerName(beerDTO.getBeerName().toUpperCase())
                 .beerStyle(beerDTO.getBeerStyle())
                 .upc(beerDTO.getUpc())
-                .price(beerDTO.getPrice())
                 .quantityOnHand(beerDTO.getQuantityOnHand())
+                .price(beerDTO.getPrice())
+                .createdAt(now)
+                .updatedAt(now)
                 .build();
         beerMap.put(newBeer.getId(), newBeer);
         return newBeer;
     }
 
     @Override
-    public void deleteBeer(UUID beerId) {
+    public void updateBeer(UUID id, BeerDTO beerDTO) {
+        log.debug("updateBeer() - in beer service, id = {}", id);
         // Skip checking
-        this.beerMap.remove(beerId);
+        var existing = beerMap.get(id);
+        existing.setBeerName(beerDTO.getBeerName());
+        existing.setBeerStyle(beerDTO.getBeerStyle());
+        existing.setUpc(beerDTO.getUpc());
+        existing.setQuantityOnHand(beerDTO.getQuantityOnHand());
+        existing.setPrice(beerDTO.getPrice());
+        existing.setUpdatedAt(LocalDateTime.now());
+    }
+
+    @Override
+    public void deleteBeer(UUID id) {
+        log.debug("deleteBeer() - in beer service, id = {}", id);
+        beerMap.remove(id);
     }
 }

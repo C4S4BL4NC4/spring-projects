@@ -17,13 +17,7 @@ import java.util.UUID;
 public class BeerServiceJPA implements BeerService {
 
     private final BeerRepository beerRepository;
-
     private final BeerMapper beerMapper;
-
-    @Override
-    public void updateBeer(UUID id, BeerDTO beerDTO) {
-
-    }
 
     @Override
     public List<BeerDTO> getAllBeers() {
@@ -41,7 +35,12 @@ public class BeerServiceJPA implements BeerService {
     }
 
     @Override
-    public void deleteBeer(UUID beerId) {
+    public void updateBeer(UUID id, BeerDTO beerDTO) {
+
+    }
+
+    @Override
+    public void deleteBeer(UUID id) {
 
     }
 }

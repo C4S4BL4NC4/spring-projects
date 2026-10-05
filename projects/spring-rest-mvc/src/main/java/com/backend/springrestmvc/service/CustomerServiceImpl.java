@@ -11,18 +11,17 @@ import java.util.*;
 @Service
 public class CustomerServiceImpl implements CustomerService {
 
-    private final Map<UUID, CustomerDTO> customerMap;
+    private final Map<UUID, CustomerDTO> customerMap = new HashMap<>();
 
     public CustomerServiceImpl() {
-        this.customerMap = new HashMap<>();
-
-        var riri = CustomerDTO.builder()
+        var riki = CustomerDTO.builder()
                 .id(UUID.randomUUID())
                 .name("Riki Maro")
                 .version(0)
                 .createdDate(LocalDateTime.now().minusDays(30))
                 .lastModifiedDate(LocalDateTime.now().minusHours(30))
                 .build();
+
         var ibra = CustomerDTO.builder()
                 .id(UUID.randomUUID())
                 .name("Ibrahim Tatlises")
@@ -39,51 +38,51 @@ public class CustomerServiceImpl implements CustomerService {
                 .lastModifiedDate(LocalDateTime.now().minusDays(30))
                 .build();
 
-        this.customerMap.put(riri.getId(), riri);
-        this.customerMap.put(ibra.getId(), ibra);
-        this.customerMap.put(carm.getId(), carm);
+        customerMap.put(riki.getId(), riki);
+        customerMap.put(ibra.getId(), ibra);
+        customerMap.put(carm.getId(), carm);
     }
 
     @Override
     public List<CustomerDTO> getAllCustomers() {
-        log.debug("getAllCustomers() -  in customer service");
-        return new ArrayList<>(this.customerMap.values());
+        log.debug("getAllCustomers() - in customer service");
+        return new ArrayList<>(customerMap.values());
     }
 
     @Override
     public Optional<CustomerDTO> getCustomerById(UUID id) {
-        log.debug("getCustomerById() - in customer service");
-        return Optional.of(customerMap.get(id));
+        log.debug("getCustomerById() - in customer service, id = {}", id);
+        return Optional.ofNullable(customerMap.get(id));
     }
 
     @Override
     public CustomerDTO createCustomer(CustomerDTO customerDTO) {
-        log.debug("createCustomer() - in customerDTO service");
+        log.debug("createCustomer() - in customer service");
+        var now = LocalDateTime.now();
         var newCustomer = CustomerDTO.builder()
                 .id(UUID.randomUUID())
                 .name(customerDTO.getName())
                 .version(0)
-                .createdDate(LocalDateTime.now())
-                .lastModifiedDate(LocalDateTime.now())
+                .createdDate(now)
+                .lastModifiedDate(now)
                 .build();
-        this.customerMap.put(newCustomer.getId(), newCustomer);
+        customerMap.put(newCustomer.getId(), newCustomer);
         return newCustomer;
     }
 
     @Override
     public void updateCustomer(UUID id, CustomerDTO customerDTO) {
-        log.debug("updateCustomer() - in customerDTO service");
-        var existing = this.customerMap.get(id);
+        log.debug("updateCustomer() - in customer service, id = {}", id);
         // Skip checking
+        var existing = customerMap.get(id);
         existing.setName(customerDTO.getName());
         existing.setVersion(existing.getVersion() + 1);
         existing.setLastModifiedDate(LocalDateTime.now());
-        this.customerMap.put(existing.getId(), existing);
     }
 
     @Override
-    public void deleteCustomer(UUID customerId) {
-        // Skip checking
-        this.customerMap.remove(customerId);
+    public void deleteCustomer(UUID id) {
+        log.debug("deleteCustomer() - in customer service, id = {}", id);
+        customerMap.remove(id);
     }
 }

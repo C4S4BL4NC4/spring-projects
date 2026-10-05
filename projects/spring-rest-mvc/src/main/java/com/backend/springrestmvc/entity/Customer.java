@@ -2,7 +2,9 @@ package com.backend.springrestmvc.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UuidGenerator;
+import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -15,20 +17,16 @@ import java.util.UUID;
 @AllArgsConstructor
 public class Customer {
     @Id
-    @GeneratedValue(generator = "UUID")
+    @GeneratedValue
     @UuidGenerator
-    @Column(
-            length = 36,
-            columnDefinition = "varchar",
-            unique = true,
-            nullable = false,
-            updatable = false
-    )
+    @JdbcTypeCode(SqlTypes.CHAR)
+    @Column(length = 36, columnDefinition = "varchar(36)", nullable = false, updatable = false)
     private UUID id;
-    private String name;
 
     @Version
     private Integer version;
+
+    private String name;
     private LocalDateTime createdDate;
     private LocalDateTime lastModifiedDate;
 }
