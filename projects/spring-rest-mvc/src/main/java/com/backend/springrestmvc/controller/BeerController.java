@@ -6,6 +6,7 @@ import com.backend.springrestmvc.service.BeerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -35,7 +36,7 @@ public class BeerController {
     }
 
     @PostMapping(BEERS_PATH)
-    public ResponseEntity<BeerDTO> createBeer(@RequestBody BeerDTO beerDTO) {
+    public ResponseEntity<BeerDTO> createBeer(@Validated @RequestBody BeerDTO beerDTO) {
         log.debug("createBeer() - in BeerController");
         BeerDTO savedBeerDTO = beerService.saveNewBeer(beerDTO);
         return ResponseEntity
