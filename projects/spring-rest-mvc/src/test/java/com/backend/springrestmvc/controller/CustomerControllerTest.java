@@ -56,6 +56,7 @@ class CustomerControllerTest {
     @Test
     void deleteCustomer() throws Exception {
         CustomerDTO customerDTO = customerServiceImpl.getAllCustomers().get(0);
+        given(customerService.deleteCustomer(any(UUID.class))).willReturn(true);
 
         mockMvc.perform(
                         delete(
@@ -71,8 +72,27 @@ class CustomerControllerTest {
     }
 
     @Test
+    void deleteCustomerNotFound() throws Exception {
+        given(customerService.deleteCustomer(any(UUID.class))).willReturn(false);
+
+        mockMvc.perform(delete(CustomerController.CUSTOMERS_PATH_ID, UUID.randomUUID()))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void updateCustomerNotFound() throws Exception {
+        given(customerService.updateCustomer(any(UUID.class), any(CustomerDTO.class))).willReturn(Optional.empty());
+
+        mockMvc.perform(put(CustomerController.CUSTOMERS_PATH_ID, UUID.randomUUID())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(customerDTO)))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
     void updateCustomer() throws Exception {
         CustomerDTO customerDTO = customerServiceImpl.getAllCustomers().get(0);
+        given(customerService.updateCustomer(any(UUID.class), any(CustomerDTO.class))).willReturn(Optional.of(customerDTO));
 
         mockMvc.perform(
                 put(

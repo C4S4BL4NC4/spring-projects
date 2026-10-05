@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -37,16 +38,28 @@ public class CustomerServiceJPA implements CustomerService {
 
     @Override
     public CustomerDTO createCustomer(CustomerDTO customerDTO) {
-        return null;
+        var customer = customerMapper.customerDTOToCustomer(customerDTO);
+        var now = LocalDateTime.now();
+        customer.setCreatedDate(now);
+        customer.setLastModifiedDate(now);
+        return customerMapper.customerToCustomerDTO(customerRepository.save(customer));
     }
 
     @Override
-    public void updateCustomer(UUID id, CustomerDTO customerDTO) {
-
+    public Optional<CustomerDTO> updateCustomer(UUID id, CustomerDTO customerDTO) {
+        return customerRepository.findById(id).map(customer -> {
+            customer.setName(customerDTO.getName());
+            customer.setLastModifiedDate(LocalDateTime.now());
+            return customerMapper.customerToCustomerDTO(customerRepository.save(customer));
+        });
     }
 
     @Override
-    public void deleteCustomer(UUID id) {
-
+    public boolean deleteCustomer(UUID id) {
+        if (customerRepository.existsById(id)) {
+            customerRepository.deleteById(id);
+            return true;
+        }
+        return false;
     }
 }
