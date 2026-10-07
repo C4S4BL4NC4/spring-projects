@@ -2,6 +2,9 @@ package com.backend.springrestmvc.entity;
 
 import com.backend.springrestmvc.model.BeerStyle;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UuidGenerator;
@@ -28,13 +31,21 @@ public class Beer {
     @Version
     private Integer version;
 
+    @NotNull
+    @NotBlank
+    @Size(min = 1, max = 50)
     private String beerName;
 
+    @NotNull
     @Enumerated(EnumType.STRING)
     private BeerStyle beerStyle;
 
+    @NotNull
+    @Size(min = 1, max = 255)
     private String upc;
     private Integer quantityOnHand;
+
+    @NotNull
     private BigDecimal price;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
