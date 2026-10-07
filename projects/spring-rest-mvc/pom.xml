@@ -116,6 +116,12 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <!-- ./mvnw spring-boot:run uses MySQL; tests stay on H2 -->
+                    <profiles>
+                        <profile>mysql</profile>
+                    </profiles>
+                </configuration>
             </plugin>
 
             <!-- Java compiler + annotation processors -->
