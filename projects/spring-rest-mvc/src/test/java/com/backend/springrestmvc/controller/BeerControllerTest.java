@@ -135,6 +135,25 @@ class BeerControllerTest {
     }
 
     @Test
+    void updateBeerBlankFields() throws Exception {
+        BeerDTO beerDTO = beerServiceImpl.getAllBeers().getFirst();
+        beerDTO.setBeerStyle(null);
+        beerDTO.setBeerName("");
+        beerDTO.setUpc(null);
+
+        given(beerService.updateBeer(any(UUID.class), any(BeerDTO.class))).willReturn(Optional.of(beerDTO));
+
+        mockMvc.perform(
+                put(
+                        BeerController.BEERS_PATH_ID, beerDTO.getId().toString()
+                ).accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(beerDTO))
+        ).andExpect(status().isBadRequest());
+
+    }
+
+    @Test
     void getBeers() throws Exception {
         given(beerService.getAllBeers()).willReturn(beerServiceImpl.getAllBeers());
 
