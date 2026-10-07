@@ -16,8 +16,13 @@ public class CustomErrorController {
     ResponseEntity handleJPAViolations(TransactionSystemException exception) {
         ResponseEntity.BodyBuilder responseEntity = ResponseEntity.badRequest();
 
-        if (exception.getCause() instanceof ConstraintViolationException) {
-            var ve = (ConstraintViolationException) exception.getCause().getCause();
+        // The violation is wrapped (usually in a RollbackException), so walk the cause chain to find it.
+        Throwable cause = exception.getCause();
+        while (cause != null && !(cause instanceof ConstraintViolationException)) {
+            cause = cause.getCause();
+        }
+
+        if (cause instanceof ConstraintViolationException ve) {
             var errors = ve.getConstraintViolations().stream()
                     .map(constraintViolation -> {
                         Map<String, String> errorMap = new HashMap<>();
