@@ -27,6 +27,10 @@ public class Customer {
     private Integer version;
 
     private String name;
+
+    @Column(length = 100)
+    private String email;
+    
     private LocalDateTime createdDate;
     private LocalDateTime lastModifiedDate;
 }
