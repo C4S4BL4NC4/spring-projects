@@ -23,7 +23,6 @@ public class BeerDTO {
     @NotNull
     private String beerName;
 
-    @NotBlank
     @NotNull
     private BeerStyle beerStyle;
 
@@ -32,7 +31,6 @@ public class BeerDTO {
     private String upc;
     private Integer quantityOnHand;
 
-    @NotBlank
     @NotNull
     private BigDecimal price;
     private LocalDateTime createdAt;
