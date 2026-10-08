@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -50,7 +49,6 @@ public class BeerServiceJPA implements BeerService {
             beer.setQuantityOnHand(beerDTO.getQuantityOnHand());
             beer.setPrice(beerDTO.getPrice());
             beer.setUpc(beerDTO.getUpc());
-            beer.setUpdatedAt(LocalDateTime.now());
             return beerMapper.beerToBeerDTO(beerRepository.save(beer));
         });
     }

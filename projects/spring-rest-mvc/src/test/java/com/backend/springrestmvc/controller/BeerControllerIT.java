@@ -80,7 +80,7 @@ class BeerControllerIT {
     @Test
     void getAllBeers() {
         var dtos = beerController.getAllBeers();
-        assertThat(dtos.size()).isEqualTo(3);
+        assertThat(dtos.size()).isGreaterThan(2100);
     }
 
     @Rollback

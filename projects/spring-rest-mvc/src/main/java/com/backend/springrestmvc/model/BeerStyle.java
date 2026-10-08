@@ -6,5 +6,9 @@ public enum BeerStyle {
     MALT,
     IPA,
     WHEAT,
-    PILSNER
+    PILSNER,
+    PORTER,
+    ALE,
+    SAISON,
+    PALE_ALE
 }
