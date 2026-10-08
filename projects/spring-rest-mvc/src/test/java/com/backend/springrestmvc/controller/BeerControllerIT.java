@@ -21,7 +21,9 @@ import tools.jackson.databind.ObjectMapper;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -48,6 +50,17 @@ class BeerControllerIT {
     @BeforeEach
     void setUp() {
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
+    }
+
+    @Test
+    void testListBeersByName() throws Exception {
+        mockMvc.perform(
+                        get(BeerController.BEERS_PATH)
+                                .queryParam("beerName", "IPA")
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.size()", is(2413)));
+
     }
 
     @Test
@@ -79,7 +92,7 @@ class BeerControllerIT {
 
     @Test
     void getAllBeers() {
-        var dtos = beerController.getAllBeers();
+        var dtos = beerController.getAllBeers(null);
         assertThat(dtos.size()).isGreaterThan(2100);
     }
 
@@ -88,7 +101,7 @@ class BeerControllerIT {
     @Test
     void emptyList() {
         beerRepository.deleteAll();
-        var dtos = beerController.getAllBeers();
+        var dtos = beerController.getAllBeers(null);
         assertThat(dtos.size()).isEqualTo(0);
     }
 

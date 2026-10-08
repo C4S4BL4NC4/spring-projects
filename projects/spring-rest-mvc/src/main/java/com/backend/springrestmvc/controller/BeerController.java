@@ -24,9 +24,9 @@ public class BeerController {
     private final BeerService beerService;
 
     @GetMapping(BEERS_PATH)
-    public List<BeerDTO> getAllBeers() {
+    public List<BeerDTO> getAllBeers(@RequestParam(required = false) String beerName) {
         log.debug("getAllBeers() - in BeerController");
-        return beerService.getAllBeers();
+        return beerService.listBeers(null);
     }
 
     @GetMapping(BEERS_PATH_ID)
@@ -42,6 +42,7 @@ public class BeerController {
         return ResponseEntity
                 .created(URI.create(BEERS_PATH + "/" + savedBeerDTO.getId()))
                 .body(savedBeerDTO);
+
     }
 
     @PutMapping(BEERS_PATH_ID)
@@ -60,3 +61,4 @@ public class BeerController {
         return ResponseEntity.noContent().build();
     }
 }
+

@@ -1,9 +1,11 @@
 package com.backend.springrestmvc.service;
 
+import com.backend.springrestmvc.entity.Beer;
 import com.backend.springrestmvc.mapper.BeerMapper;
 import com.backend.springrestmvc.model.BeerDTO;
 import com.backend.springrestmvc.repository.BeerRepository;
 import lombok.RequiredArgsConstructor;
+import org.flywaydb.core.internal.util.StringUtils;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
@@ -21,12 +23,25 @@ public class BeerServiceJPA implements BeerService {
     private final BeerMapper beerMapper;
 
     @Override
-    public List<BeerDTO> getAllBeers() {
+    public List<BeerDTO> listBeers(String beerName) {
+        List<Beer> list;
 
-        return beerRepository.findAll()
+        if (StringUtils.hasText(beerName)) {
+            // do impl
+            list = listBeersByName(beerName);
+
+        } else {
+            list = beerRepository.findAll();
+        }
+
+        return list
                 .stream()
                 .map(beerMapper::beerToBeerDTO)
                 .collect(Collectors.toList());
+    }
+
+    private List<Beer> listBeersByName(String beerName) {
+        return beerRepository.findAllByBeerNameIsLikeIgnoreCase("%" + beerName + "%");
     }
 
     @Override
