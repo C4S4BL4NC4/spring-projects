@@ -10,6 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.Rollback;
@@ -50,7 +51,19 @@ class BeerControllerIT {
 
     @BeforeEach
     void setUp() {
+
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
+    }
+
+    @Test
+    void testListBeersPaging() throws Exception {
+        mockMvc.perform(get(BeerController.BEERS_PATH)
+                        .queryParam("beerName", "IPA")
+                        .queryParam("beerStyle", BeerStyle.IPA.name())
+                        .queryParam("pageNumber", "2")
+                        .queryParam("pageSize", "50"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content.length()", is(50)));
     }
 
     @Test
@@ -60,7 +73,7 @@ class BeerControllerIT {
                                 .queryParam("beerName", "IPA")
                 )
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.size()", is(336)));
+                .andExpect(jsonPath("$.totalElements", is(336)));
 
     }
 
@@ -71,7 +84,7 @@ class BeerControllerIT {
                                 .queryParam("beerStyle", BeerStyle.IPA.name())
                 )
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.size()", is(547)));
+                .andExpect(jsonPath("$.totalElements", is(547)));
 
     }
 
@@ -83,7 +96,7 @@ class BeerControllerIT {
                                 .queryParam("beerName", "IPA")
                 )
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.size()", is(310)));
+                .andExpect(jsonPath("$.totalElements", is(310)));
     }
 
     @Test
@@ -115,8 +128,20 @@ class BeerControllerIT {
 
     @Test
     void getAllBeers() {
-        var dtos = beerController.getAllBeers(null, null);
-        assertThat(dtos.size()).isGreaterThan(2100);
+        var dtos = beerController.listBeers(null, null, 1, 25);
+        assertThat(dtos.getTotalElements()).isGreaterThan(2100);
+    }
+
+    @Test
+    void listBeersSortedByNameDesc() {
+        var dtos = beerController.listBeers(null, null, 1, 25);
+
+        var expectedNames = beerRepository.findAll(Sort.by(Sort.Order.desc("beerName"))).stream()
+                .limit(25)
+                .map(Beer::getBeerName)
+                .toList();
+
+        assertThat(dtos.getContent()).extracting(BeerDTO::getBeerName).isEqualTo(expectedNames);
     }
 
     @Rollback
@@ -124,8 +149,8 @@ class BeerControllerIT {
     @Test
     void emptyList() {
         beerRepository.deleteAll();
-        var dtos = beerController.getAllBeers(null, null);
-        assertThat(dtos.size()).isEqualTo(0);
+        var dtos = beerController.listBeers(null, null, 1, 25);
+        assertThat(dtos.getTotalElements()).isEqualTo(0);
     }
 
     @Rollback
