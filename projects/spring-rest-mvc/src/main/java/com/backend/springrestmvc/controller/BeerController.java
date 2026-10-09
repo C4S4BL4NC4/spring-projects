@@ -2,6 +2,7 @@ package com.backend.springrestmvc.controller;
 
 import com.backend.springrestmvc.exception.NotFoundException;
 import com.backend.springrestmvc.model.BeerDTO;
+import com.backend.springrestmvc.model.BeerStyle;
 import com.backend.springrestmvc.service.BeerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,9 +25,10 @@ public class BeerController {
     private final BeerService beerService;
 
     @GetMapping(BEERS_PATH)
-    public List<BeerDTO> getAllBeers(@RequestParam(required = false) String beerName) {
+    public List<BeerDTO> getAllBeers(@RequestParam(required = false) String beerName,
+                                     @RequestParam(required = false) BeerStyle beerStyle) {
         log.debug("getAllBeers() - in BeerController");
-        return beerService.listBeers(null);
+        return beerService.listBeers(beerName, beerStyle);
     }
 
     @GetMapping(BEERS_PATH_ID)

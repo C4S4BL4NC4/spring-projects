@@ -3,6 +3,7 @@ package com.backend.springrestmvc.service;
 import com.backend.springrestmvc.entity.Beer;
 import com.backend.springrestmvc.mapper.BeerMapper;
 import com.backend.springrestmvc.model.BeerDTO;
+import com.backend.springrestmvc.model.BeerStyle;
 import com.backend.springrestmvc.repository.BeerRepository;
 import lombok.RequiredArgsConstructor;
 import org.flywaydb.core.internal.util.StringUtils;
@@ -23,24 +24,28 @@ public class BeerServiceJPA implements BeerService {
     private final BeerMapper beerMapper;
 
     @Override
-    public List<BeerDTO> listBeers(String beerName) {
-        List<Beer> list;
+    public List<BeerDTO> listBeers(String beerName, BeerStyle beerStyle) {
 
-        if (StringUtils.hasText(beerName)) {
-            // do impl
-            list = listBeersByName(beerName);
+        List<Beer> beerList;
 
+        if (StringUtils.hasText(beerName) && beerStyle == null) {
+            beerList = listBeersByName(beerName);
+        } else if (!StringUtils.hasText(beerName) && beerStyle != null) {
+            beerList = listBeersByStyle(beerStyle);
         } else {
-            list = beerRepository.findAll();
+            beerList = beerRepository.findAll();
         }
 
-        return list
-                .stream()
+        return beerList.stream()
                 .map(beerMapper::beerToBeerDTO)
                 .collect(Collectors.toList());
     }
 
-    private List<Beer> listBeersByName(String beerName) {
+    public List<Beer> listBeersByStyle(BeerStyle beerStyle) {
+        return beerRepository.findAllByBeerStyle(beerStyle);
+    }
+
+    public List<Beer> listBeersByName(String beerName) {
         return beerRepository.findAllByBeerNameIsLikeIgnoreCase("%" + beerName + "%");
     }
 

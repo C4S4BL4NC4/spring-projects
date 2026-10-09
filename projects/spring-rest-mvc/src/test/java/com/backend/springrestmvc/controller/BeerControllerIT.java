@@ -4,6 +4,7 @@ import com.backend.springrestmvc.entity.Beer;
 import com.backend.springrestmvc.exception.NotFoundException;
 import com.backend.springrestmvc.mapper.BeerMapper;
 import com.backend.springrestmvc.model.BeerDTO;
+import com.backend.springrestmvc.model.BeerStyle;
 import com.backend.springrestmvc.repository.BeerRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -59,7 +60,18 @@ class BeerControllerIT {
                                 .queryParam("beerName", "IPA")
                 )
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.size()", is(2413)));
+                .andExpect(jsonPath("$.size()", is(336)));
+
+    }
+
+    @Test
+    void testListBeersByStyle() throws Exception {
+        mockMvc.perform(
+                        get(BeerController.BEERS_PATH)
+                                .queryParam("beerStyle", BeerStyle.IPA.name())
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.size()", is(547)));
 
     }
 
@@ -92,7 +104,7 @@ class BeerControllerIT {
 
     @Test
     void getAllBeers() {
-        var dtos = beerController.getAllBeers(null);
+        var dtos = beerController.getAllBeers(null, null);
         assertThat(dtos.size()).isGreaterThan(2100);
     }
 
@@ -101,7 +113,7 @@ class BeerControllerIT {
     @Test
     void emptyList() {
         beerRepository.deleteAll();
-        var dtos = beerController.getAllBeers(null);
+        var dtos = beerController.getAllBeers(null, null);
         assertThat(dtos.size()).isEqualTo(0);
     }
 
