@@ -76,6 +76,17 @@ class BeerControllerIT {
     }
 
     @Test
+    void testListBeerByStyleAndBeerName() throws Exception {
+        mockMvc.perform(
+                        get(BeerController.BEERS_PATH)
+                                .queryParam("beerStyle", BeerStyle.IPA.name())
+                                .queryParam("beerName", "IPA")
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.size()", is(310)));
+    }
+
+    @Test
     void updateBeerNameTooLong() throws Exception {
         Beer beer = beerRepository.findAll().getFirst();
         BeerDTO dto = beerMapper.beerToBeerDTO(beer);

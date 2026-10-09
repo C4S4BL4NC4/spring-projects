@@ -6,9 +6,9 @@ import com.backend.springrestmvc.model.BeerDTO;
 import com.backend.springrestmvc.model.BeerStyle;
 import com.backend.springrestmvc.repository.BeerRepository;
 import lombok.RequiredArgsConstructor;
-import org.flywaydb.core.internal.util.StringUtils;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,9 +28,14 @@ public class BeerServiceJPA implements BeerService {
 
         List<Beer> beerList;
 
-        if (StringUtils.hasText(beerName) && beerStyle == null) {
+        boolean hasName = StringUtils.hasText(beerName);
+        boolean hasStyle = beerStyle != null;
+
+        if (hasName && hasStyle) {
+            beerList = listBeersByStyleAndBeerName(beerStyle, beerName);
+        } else if (hasName) {
             beerList = listBeersByName(beerName);
-        } else if (!StringUtils.hasText(beerName) && beerStyle != null) {
+        } else if (hasStyle) {
             beerList = listBeersByStyle(beerStyle);
         } else {
             beerList = beerRepository.findAll();
@@ -41,12 +46,17 @@ public class BeerServiceJPA implements BeerService {
                 .collect(Collectors.toList());
     }
 
-    public List<Beer> listBeersByStyle(BeerStyle beerStyle) {
+    // Filtering Helper Methods
+    private List<Beer> listBeersByStyle(BeerStyle beerStyle) {
         return beerRepository.findAllByBeerStyle(beerStyle);
     }
 
-    public List<Beer> listBeersByName(String beerName) {
+    private List<Beer> listBeersByName(String beerName) {
         return beerRepository.findAllByBeerNameIsLikeIgnoreCase("%" + beerName + "%");
+    }
+
+    private List<Beer> listBeersByStyleAndBeerName(BeerStyle beerStyle, String beerName) {
+        return beerRepository.findAllByBeerStyleAndBeerNameIsLikeIgnoreCase(beerStyle, "%" + beerName + "%");
     }
 
     @Override
