@@ -44,10 +44,9 @@ public class BeerServiceJPA implements BeerService {
         } else if (StringUtils.hasText(beerName) && beerStyle != null) {
             beerPage = listBeersByStyleAndBeerName(beerName, beerStyle, pageRequest);
         } else {
-            beerPage = beerRepository.findAll(pageRequest);
+            beerPage = findAllBeers(pageRequest);
         }
 
-        
         return beerPage.map(beerMapper::beerToBeerDTO);
     }
 
@@ -105,7 +104,7 @@ public class BeerServiceJPA implements BeerService {
     // Pagination Helper Methods
     private PageRequest buildPageRequest(Integer pageNumber, Integer pageSize) {
         int queryPageNumber = pageNumber == null || pageNumber <= 0 ? DEFAULT_PAGE_NUMBER : pageNumber - 1;
-        // set maximum page size constant later
+        // Set maximum page size constants later 1000
         int queryPageSize = pageSize == null || pageSize <= 0 || pageSize > 1000 ? DEFAULT_PAGE_SIZE : pageSize;
 
         Sort sort = Sort.by(Sort.Order.desc("beerName"));
