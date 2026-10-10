@@ -18,7 +18,6 @@ import java.util.UUID;
 @Entity
 @Builder
 public class BeerOrderLine {
-
     @Id
     @GeneratedValue(generator = "UUID")
     @UuidGenerator
@@ -35,6 +34,13 @@ public class BeerOrderLine {
 
     @UpdateTimestamp
     private Timestamp lastModifiedDate;
+
+    @ManyToOne
+    private BeerOrder beerOrder;
+
+    @ManyToOne
+    private Beer beer;
+
     private Integer orderQuantity = 0;
     private Integer quantityAllocated = 0;
 

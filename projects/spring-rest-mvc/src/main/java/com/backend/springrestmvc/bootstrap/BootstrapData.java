@@ -71,8 +71,6 @@ public class BootstrapData implements CommandLineRunner {
                     .upc("222222")
                     .quantityOnHand(110)
                     .price(BigDecimal.valueOf(120.00))
-                    .createdAt(LocalDateTime.now().minusDays(3))
-                    .updatedAt(LocalDateTime.now().minusMinutes(20))
                     .build();
 
             var tuborgGold = Beer.builder()
@@ -81,8 +79,6 @@ public class BootstrapData implements CommandLineRunner {
                     .upc("111111")
                     .quantityOnHand(60)
                     .price(BigDecimal.valueOf(125.00))
-                    .createdAt(LocalDateTime.now().minusDays(2))
-                    .updatedAt(LocalDateTime.now().minusMinutes(50))
                     .build();
 
             var carlsbergPilsner = Beer.builder()
@@ -91,8 +87,6 @@ public class BootstrapData implements CommandLineRunner {
                     .upc("333333")
                     .quantityOnHand(115)
                     .price(BigDecimal.valueOf(120.00))
-                    .createdAt(LocalDateTime.now().minusDays(1))
-                    .updatedAt(LocalDateTime.now().minusMinutes(20))
                     .build();
 
             beerRepository.save(efesMalt);
@@ -107,18 +101,15 @@ public class BootstrapData implements CommandLineRunner {
             var riki = Customer.builder()
                     .name("Riki Maro")
                     .createdDate(LocalDateTime.now().minusDays(30))
-                    .lastModifiedDate(LocalDateTime.now().minusHours(30))
                     .build();
             var ibra = Customer.builder()
                     .name("Ibrahim Tatlises")
                     .createdDate(LocalDateTime.now().minusDays(60))
-                    .lastModifiedDate(LocalDateTime.now().minusDays(2))
                     .build();
 
             var carm = Customer.builder()
                     .name("Carmine Berzatto")
                     .createdDate(LocalDateTime.now().minusDays(30))
-                    .lastModifiedDate(LocalDateTime.now().minusDays(30))
                     .build();
 
             customerRepository.save(riki);

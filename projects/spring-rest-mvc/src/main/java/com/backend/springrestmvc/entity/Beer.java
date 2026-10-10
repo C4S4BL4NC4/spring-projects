@@ -14,6 +14,7 @@ import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Set;
 import java.util.UUID;
 
 @Getter
@@ -24,10 +25,10 @@ import java.util.UUID;
 @AllArgsConstructor
 public class Beer {
     @Id
-    @GeneratedValue
+    @GeneratedValue(generator = "UUID")
     @UuidGenerator
+    @Column(length = 36, columnDefinition = "varchar", updatable = false, nullable = false)
     @JdbcTypeCode(SqlTypes.CHAR)
-    @Column(length = 36, columnDefinition = "varchar(36)", nullable = false, updatable = false)
     private UUID id;
 
     @Version
@@ -35,24 +36,29 @@ public class Beer {
 
     @NotNull
     @NotBlank
-    @Size(min = 1, max = 50)
+    @Size(max = 50)
+    @Column(length = 50)
     private String beerName;
 
     @NotNull
-    @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(value = SqlTypes.SMALLINT)
     private BeerStyle beerStyle;
 
     @NotNull
-    @Size(min = 1, max = 255)
+    @NotBlank
+    @Size(max = 255)
     private String upc;
     private Integer quantityOnHand;
 
     @NotNull
     private BigDecimal price;
 
+    @OneToMany(mappedBy = "beer")
+    private Set<BeerOrderLine> beerOrderLines;
+
     @CreationTimestamp
-    private LocalDateTime createdAt;
+    private LocalDateTime createdDate;
 
     @UpdateTimestamp
-    private LocalDateTime updatedAt;
+    private LocalDateTime updateDate;
 }

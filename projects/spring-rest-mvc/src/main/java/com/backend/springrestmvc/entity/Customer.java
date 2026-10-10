@@ -2,13 +2,12 @@ package com.backend.springrestmvc.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 import java.util.UUID;
 
 @Getter
@@ -19,23 +18,21 @@ import java.util.UUID;
 @AllArgsConstructor
 public class Customer {
     @Id
-    @GeneratedValue
+    @GeneratedValue(generator = "UUID")
     @UuidGenerator
+    @Column(length = 36, columnDefinition = "varchar", updatable = false, nullable = false)
     @JdbcTypeCode(SqlTypes.CHAR)
-    @Column(length = 36, columnDefinition = "varchar(36)", nullable = false, updatable = false)
     private UUID id;
+    private String name;
+
+    @Column(length = 255)
+    private String email;
 
     @Version
     private Integer version;
-
-    private String name;
-
-    @Column(length = 100)
-    private String email;
-
-    @CreationTimestamp
     private LocalDateTime createdDate;
+    private LocalDateTime updateDate;
 
-    @UpdateTimestamp
-    private LocalDateTime lastModifiedDate;
+    @OneToMany(mappedBy = "customer")
+    private Set<BeerOrder> beerOrders;
 }
