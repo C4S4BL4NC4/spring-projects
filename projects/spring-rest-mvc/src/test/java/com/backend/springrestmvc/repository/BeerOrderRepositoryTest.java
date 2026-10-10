@@ -2,6 +2,7 @@ package com.backend.springrestmvc.repository;
 
 import com.backend.springrestmvc.entity.Beer;
 import com.backend.springrestmvc.entity.BeerOrder;
+import com.backend.springrestmvc.entity.BeerOrderShipment;
 import com.backend.springrestmvc.entity.Customer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,6 +37,9 @@ class BeerOrderRepositoryTest {
         BeerOrder beerOrder = BeerOrder.builder()
                 .customerRef("Test order")
                 .customer(testCustomer)
+                .beerOrderShipment(BeerOrderShipment.builder()
+                        .trackingNumber("1234r")
+                        .build())
                 .build();
 
         BeerOrder savedBeerOrder = beerOrderRepository.saveAndFlush(beerOrder);
