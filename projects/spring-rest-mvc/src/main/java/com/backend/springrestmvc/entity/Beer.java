@@ -56,6 +56,9 @@ public class Beer {
     @OneToMany(mappedBy = "beer")
     private Set<BeerOrderLine> beerOrderLines;
 
+    @ManyToMany(mappedBy = "beers")
+    private Set<Category> categories;
+
     @CreationTimestamp
     private LocalDateTime createdDate;
 
