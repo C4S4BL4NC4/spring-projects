@@ -1,5 +1,6 @@
 package com.backend.springrestmvc.controller;
 
+import com.backend.springrestmvc.config.SpringSecurityConfig;
 import com.backend.springrestmvc.model.BeerDTO;
 import com.backend.springrestmvc.model.BeerStyle;
 import com.backend.springrestmvc.service.BeerService;
@@ -24,6 +25,7 @@ import static org.hamcrest.core.Is.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -159,6 +161,7 @@ class BeerControllerTest {
 
         mockMvc.perform(
                         get(BeerController.BEERS_PATH)
+                                .with(httpBasic(SpringSecurityConfig.USERNAME, SpringSecurityConfig.PASSWORD))
                                 .accept(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().isOk())
@@ -175,6 +178,7 @@ class BeerControllerTest {
                 .willReturn(Optional.of(beerDTO));
 
         var result = mockMvc.perform(get(BeerController.BEERS_PATH_ID, beerDTO.getId().toString())
+                        .with(httpBasic(SpringSecurityConfig.USERNAME, SpringSecurityConfig.PASSWORD))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))

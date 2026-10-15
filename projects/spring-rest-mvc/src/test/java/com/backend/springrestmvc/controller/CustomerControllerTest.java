@@ -1,5 +1,6 @@
 package com.backend.springrestmvc.controller;
 
+import com.backend.springrestmvc.config.SpringSecurityConfig;
 import com.backend.springrestmvc.model.CustomerDTO;
 import com.backend.springrestmvc.service.CustomerService;
 import com.backend.springrestmvc.service.CustomerServiceImpl;
@@ -21,6 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -61,7 +63,9 @@ class CustomerControllerTest {
         mockMvc.perform(
                         delete(
                                 CustomerController.CUSTOMERS_PATH_ID, customerDTO.getId().toString()
-                        ).accept(MediaType.APPLICATION_JSON)
+                        )
+                                .with(httpBasic(SpringSecurityConfig.USERNAME, SpringSecurityConfig.PASSWORD))
+                                .accept(MediaType.APPLICATION_JSON)
                                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
 
@@ -91,13 +95,15 @@ class CustomerControllerTest {
 
     @Test
     void updateCustomer() throws Exception {
-        CustomerDTO customerDTO = customerServiceImpl.getAllCustomers().get(0);
+        CustomerDTO customerDTO = customerServiceImpl.getAllCustomers().getFirst();
         given(customerService.updateCustomer(any(UUID.class), any(CustomerDTO.class))).willReturn(Optional.of(customerDTO));
 
         mockMvc.perform(
                 put(
                         CustomerController.CUSTOMERS_PATH_ID, customerDTO.getId().toString()
-                ).accept(MediaType.APPLICATION_JSON)
+                )
+                        .with(httpBasic(SpringSecurityConfig.USERNAME, SpringSecurityConfig.PASSWORD))
+                        .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(customerDTO))
         ).andExpect(status().isNoContent());
@@ -113,6 +119,7 @@ class CustomerControllerTest {
         mockMvc.perform(
                         post(
                                 CustomerController.CUSTOMERS_PATH)
+                                .with(httpBasic(SpringSecurityConfig.USERNAME, SpringSecurityConfig.PASSWORD))
                                 .accept(MediaType.APPLICATION_JSON)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(customerDTO))
@@ -127,7 +134,9 @@ class CustomerControllerTest {
         var result = mockMvc.perform(
                         get(
                                 CustomerController.CUSTOMERS_PATH
-                        ).accept(MediaType.APPLICATION_JSON))
+                        )
+                                .with(httpBasic(SpringSecurityConfig.USERNAME, SpringSecurityConfig.PASSWORD))
+                                .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
@@ -146,7 +155,9 @@ class CustomerControllerTest {
         var result = mockMvc.perform(
                         get(
                                 CustomerController.CUSTOMERS_PATH_ID, customerDTO.getId().toString()
-                        ).accept(MediaType.APPLICATION_JSON))
+                        )
+                                .with(httpBasic(SpringSecurityConfig.USERNAME, SpringSecurityConfig.PASSWORD))
+                                .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
