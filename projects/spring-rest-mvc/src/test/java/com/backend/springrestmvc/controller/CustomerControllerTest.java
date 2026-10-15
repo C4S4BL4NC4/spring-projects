@@ -56,6 +56,11 @@ class CustomerControllerTest {
     }
 
     @Test
+    void unauthorizedUser() {
+
+    }
+
+    @Test
     void deleteCustomer() throws Exception {
         CustomerDTO customerDTO = customerServiceImpl.getAllCustomers().get(0);
         given(customerService.deleteCustomer(any(UUID.class))).willReturn(true);

@@ -28,6 +28,7 @@ class CustomerControllerIT {
 
     @Autowired
     CustomerMapper customerMapper;
+    
 
     @Test
     void getAllCustomers() {
