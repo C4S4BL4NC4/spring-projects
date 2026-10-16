@@ -21,7 +21,7 @@ public class SecurityConfig {
                         .jwt(Customizer.withDefaults()))
                 .csrf(csrf -> csrf
                         .ignoringRequestMatchers("/api/**"));
-
+        
         return http.build();
     }
 }

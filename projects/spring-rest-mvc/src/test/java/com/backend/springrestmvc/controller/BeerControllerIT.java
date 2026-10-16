@@ -1,6 +1,6 @@
 package com.backend.springrestmvc.controller;
 
-import com.backend.springrestmvc.config.SpringSecurityConfig;
+import com.backend.springrestmvc.config.TestJwt;
 import com.backend.springrestmvc.entity.Beer;
 import com.backend.springrestmvc.exception.NotFoundException;
 import com.backend.springrestmvc.mapper.BeerMapper;
@@ -27,7 +27,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -75,7 +74,7 @@ class BeerControllerIT {
                         .queryParam("beerStyle", BeerStyle.IPA.name())
                         .queryParam("pageNumber", "2")
                         .queryParam("pageSize", "50")
-                        .with(httpBasic(SpringSecurityConfig.USERNAME, SpringSecurityConfig.PASSWORD)))
+                        .with(TestJwt.JWT))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content.length()", is(50)));
     }
@@ -85,7 +84,7 @@ class BeerControllerIT {
         mockMvc.perform(
                         get(BeerController.BEERS_PATH)
                                 .queryParam("beerName", "IPA")
-                                .with(httpBasic(SpringSecurityConfig.USERNAME, SpringSecurityConfig.PASSWORD))
+                                .with(TestJwt.JWT)
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalElements", is(336)));
@@ -97,7 +96,7 @@ class BeerControllerIT {
         mockMvc.perform(
                         get(BeerController.BEERS_PATH)
                                 .queryParam("beerStyle", BeerStyle.IPA.name())
-                                .with(httpBasic(SpringSecurityConfig.USERNAME, SpringSecurityConfig.PASSWORD))
+                                .with(TestJwt.JWT)
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalElements", is(547)));
@@ -110,7 +109,7 @@ class BeerControllerIT {
                         get(BeerController.BEERS_PATH)
                                 .queryParam("beerStyle", BeerStyle.IPA.name())
                                 .queryParam("beerName", "IPA")
-                                .with(httpBasic(SpringSecurityConfig.USERNAME, SpringSecurityConfig.PASSWORD))
+                                .with(TestJwt.JWT)
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalElements", is(310)));
@@ -125,7 +124,7 @@ class BeerControllerIT {
         dto.setBeerName("Beer".repeat(20));
 
         mockMvc.perform(put(BeerController.BEERS_PATH_ID, beer.getId())
-                        .with(httpBasic(SpringSecurityConfig.USERNAME, SpringSecurityConfig.PASSWORD))
+                        .with(TestJwt.JWT)
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))

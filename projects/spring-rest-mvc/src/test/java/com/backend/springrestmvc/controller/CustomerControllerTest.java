@@ -1,6 +1,7 @@
 package com.backend.springrestmvc.controller;
 
-import com.backend.springrestmvc.config.SpringSecurityConfig;
+import com.backend.springrestmvc.config.SecurityConfig;
+import com.backend.springrestmvc.config.TestJwt;
 import com.backend.springrestmvc.model.CustomerDTO;
 import com.backend.springrestmvc.service.CustomerService;
 import com.backend.springrestmvc.service.CustomerServiceImpl;
@@ -9,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -22,12 +24,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(CustomerController.class)
+@Import(SecurityConfig.class)
 class CustomerControllerTest {
 
     @Autowired
@@ -69,7 +71,7 @@ class CustomerControllerTest {
                         delete(
                                 CustomerController.CUSTOMERS_PATH_ID, customerDTO.getId().toString()
                         )
-                                .with(httpBasic(SpringSecurityConfig.USERNAME, SpringSecurityConfig.PASSWORD))
+                                .with(TestJwt.JWT)
                                 .accept(MediaType.APPLICATION_JSON)
                                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
@@ -84,7 +86,8 @@ class CustomerControllerTest {
     void deleteCustomerNotFound() throws Exception {
         given(customerService.deleteCustomer(any(UUID.class))).willReturn(false);
 
-        mockMvc.perform(delete(CustomerController.CUSTOMERS_PATH_ID, UUID.randomUUID()))
+        mockMvc.perform(delete(CustomerController.CUSTOMERS_PATH_ID, UUID.randomUUID())
+                        .with(TestJwt.JWT))
                 .andExpect(status().isNotFound());
     }
 
@@ -93,6 +96,7 @@ class CustomerControllerTest {
         given(customerService.updateCustomer(any(UUID.class), any(CustomerDTO.class))).willReturn(Optional.empty());
 
         mockMvc.perform(put(CustomerController.CUSTOMERS_PATH_ID, UUID.randomUUID())
+                        .with(TestJwt.JWT)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(customerDTO)))
                 .andExpect(status().isNotFound());
@@ -107,7 +111,7 @@ class CustomerControllerTest {
                 put(
                         CustomerController.CUSTOMERS_PATH_ID, customerDTO.getId().toString()
                 )
-                        .with(httpBasic(SpringSecurityConfig.USERNAME, SpringSecurityConfig.PASSWORD))
+                        .with(TestJwt.JWT)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(customerDTO))
@@ -124,7 +128,7 @@ class CustomerControllerTest {
         mockMvc.perform(
                         post(
                                 CustomerController.CUSTOMERS_PATH)
-                                .with(httpBasic(SpringSecurityConfig.USERNAME, SpringSecurityConfig.PASSWORD))
+                                .with(TestJwt.JWT)
                                 .accept(MediaType.APPLICATION_JSON)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(customerDTO))
@@ -140,7 +144,7 @@ class CustomerControllerTest {
                         get(
                                 CustomerController.CUSTOMERS_PATH
                         )
-                                .with(httpBasic(SpringSecurityConfig.USERNAME, SpringSecurityConfig.PASSWORD))
+                                .with(TestJwt.JWT)
                                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -161,7 +165,7 @@ class CustomerControllerTest {
                         get(
                                 CustomerController.CUSTOMERS_PATH_ID, customerDTO.getId().toString()
                         )
-                                .with(httpBasic(SpringSecurityConfig.USERNAME, SpringSecurityConfig.PASSWORD))
+                                .with(TestJwt.JWT)
                                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -173,7 +177,8 @@ class CustomerControllerTest {
 
         given(customerService.getCustomerById(any())).willReturn(Optional.empty());
 
-        mockMvc.perform(get(CustomerController.CUSTOMERS_PATH_ID, UUID.randomUUID()))
+        mockMvc.perform(get(CustomerController.CUSTOMERS_PATH_ID, UUID.randomUUID())
+                        .with(TestJwt.JWT))
                 .andExpect(status().isNotFound());
     }
 }
