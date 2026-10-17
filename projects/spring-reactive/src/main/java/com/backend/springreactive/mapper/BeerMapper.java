@@ -7,7 +7,7 @@ import org.mapstruct.MappingConstants;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface BeerMapper {
-    Beer beerDTOToBeer(BeerDTO beerDTO);
+    Beer beerDtoToBeer(BeerDTO beerDto);
 
-    BeerDTO beerToBeerDTO(Beer beer);
+    BeerDTO beerToBeerDto(Beer beer);
 }
