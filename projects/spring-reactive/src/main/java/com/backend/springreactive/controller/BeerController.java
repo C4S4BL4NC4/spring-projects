@@ -3,6 +3,7 @@ package com.backend.springreactive.controller;
 import com.backend.springreactive.model.BeerDTO;
 import com.backend.springreactive.service.BeerService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -29,6 +30,17 @@ public class BeerController {
     @PostMapping(BEER_URL)
     public Mono<BeerDTO> saveBeer(@RequestBody BeerDTO beerDto) {
         return beerService.createBeer(beerDto);
+    }
+
+    @PutMapping(BEER_URL_ID)
+    public Mono<BeerDTO> updateBeer(@PathVariable Integer beerId, @RequestBody BeerDTO beerDto) {
+        return beerService.updateBeer(beerId, beerDto);
+    }
+
+    @DeleteMapping(BEER_URL_ID)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public Mono<Void> deleteBeer(@PathVariable Integer beerId) {
+        return beerService.deleteBeerById(beerId);
     }
 
 
