@@ -5,6 +5,7 @@ import com.backend.springreactive.service.BeerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -24,7 +25,8 @@ public class BeerController {
 
     @GetMapping(BEER_URL_ID)
     public Mono<BeerDTO> getBeer(@PathVariable Integer beerId) {
-        return beerService.getBeerById(beerId);
+        return beerService.getBeerById(beerId)
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)));
     }
 
     @PostMapping(BEER_URL)
@@ -34,18 +36,22 @@ public class BeerController {
 
     @PutMapping(BEER_URL_ID)
     public Mono<BeerDTO> updateBeer(@PathVariable Integer beerId, @RequestBody BeerDTO beerDto) {
-        return beerService.updateBeer(beerId, beerDto);
+        return beerService.updateBeer(beerId, beerDto)
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)));
     }
 
     @PatchMapping(BEER_URL_ID)
     public Mono<BeerDTO> patchBeer(@PathVariable Integer beerId, @RequestBody BeerDTO beerDto) {
-        return beerService.patchBeer(beerId, beerDto);
+        return beerService.patchBeer(beerId, beerDto)
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)));
     }
 
     @DeleteMapping(BEER_URL_ID)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public Mono<Void> deleteBeer(@PathVariable Integer beerId) {
-        return beerService.deleteBeerById(beerId);
+        return beerService.getBeerById(beerId)
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
+                .flatMap(foundBeer -> beerService.deleteBeerById(foundBeer.getId()));
     }
 
 

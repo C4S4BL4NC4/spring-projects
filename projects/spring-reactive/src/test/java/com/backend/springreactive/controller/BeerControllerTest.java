@@ -22,6 +22,13 @@ class BeerControllerTest {
     WebTestClient webTestClient;
 
     @Test
+    void getBeerNotFound() {
+        webTestClient.get().uri(BEER_URL_ID, 999999)
+                .exchange()
+                .expectStatus().isNotFound();
+    }
+
+    @Test
     void updateBeer() {
         BeerDTO savedBeer = createBeer();
 
@@ -52,8 +59,7 @@ class BeerControllerTest {
         webTestClient.put().uri(BEER_URL_ID, 999999)
                 .bodyValue(getNewBeerDto())
                 .exchange()
-                .expectStatus().isOk()
-                .expectBody().isEmpty();
+                .expectStatus().isNotFound();
     }
 
     @Test
@@ -83,8 +89,7 @@ class BeerControllerTest {
         webTestClient.patch().uri(BEER_URL_ID, 999999)
                 .bodyValue(BeerDTO.builder().beerName("Patched Name").build())
                 .exchange()
-                .expectStatus().isOk()
-                .expectBody().isEmpty();
+                .expectStatus().isNotFound();
     }
 
     @Test
@@ -97,7 +102,14 @@ class BeerControllerTest {
 
         webTestClient.get().uri(BEER_URL_ID, savedBeer.getId())
                 .exchange()
-                .expectBody().isEmpty();
+                .expectStatus().isNotFound();
+    }
+
+    @Test
+    void deleteBeerNotFound() {
+        webTestClient.delete().uri(BEER_URL_ID, 999999)
+                .exchange()
+                .expectStatus().isNotFound();
     }
 
     BeerDTO createBeer() {
