@@ -57,6 +57,37 @@ class BeerControllerTest {
     }
 
     @Test
+    void patchBeer() {
+        BeerDTO savedBeer = createBeer();
+
+        BeerDTO patch = BeerDTO.builder()
+                .beerName("Patched Name")
+                .build();
+
+        webTestClient.patch().uri(BEER_URL_ID, savedBeer.getId())
+                .bodyValue(patch)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(BeerDTO.class)
+                .value(beer -> {
+                    assertThat(beer.getBeerName()).isEqualTo("Patched Name");
+                    assertThat(beer.getBeerStyle()).isEqualTo(savedBeer.getBeerStyle());
+                    assertThat(beer.getUpc()).isEqualTo(savedBeer.getUpc());
+                    assertThat(beer.getQuantityOnHand()).isEqualTo(savedBeer.getQuantityOnHand());
+                    assertThat(beer.getPrice()).isEqualByComparingTo(savedBeer.getPrice());
+                });
+    }
+
+    @Test
+    void patchBeerNotFound() {
+        webTestClient.patch().uri(BEER_URL_ID, 999999)
+                .bodyValue(BeerDTO.builder().beerName("Patched Name").build())
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody().isEmpty();
+    }
+
+    @Test
     void deleteBeer() {
         BeerDTO savedBeer = createBeer();
 

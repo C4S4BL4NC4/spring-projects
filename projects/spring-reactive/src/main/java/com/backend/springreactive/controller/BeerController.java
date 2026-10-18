@@ -37,6 +37,11 @@ public class BeerController {
         return beerService.updateBeer(beerId, beerDto);
     }
 
+    @PatchMapping(BEER_URL_ID)
+    public Mono<BeerDTO> patchBeer(@PathVariable Integer beerId, @RequestBody BeerDTO beerDto) {
+        return beerService.patchBeer(beerId, beerDto);
+    }
+
     @DeleteMapping(BEER_URL_ID)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public Mono<Void> deleteBeer(@PathVariable Integer beerId) {
