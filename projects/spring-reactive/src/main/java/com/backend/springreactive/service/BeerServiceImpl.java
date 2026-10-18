@@ -1,5 +1,6 @@
 package com.backend.springreactive.service;
 
+import com.backend.springreactive.domain.Beer;
 import com.backend.springreactive.mapper.BeerMapper;
 import com.backend.springreactive.model.BeerDTO;
 import com.backend.springreactive.repository.BeerRepository;
@@ -19,6 +20,13 @@ public class BeerServiceImpl implements BeerService {
     public Mono<BeerDTO> getBeerById(Integer beerId) {
         return beerRepository.findById(beerId)
                 .map(beerMapper::beerToBeerDto);
+    }
+
+    @Override
+    public Mono<BeerDTO> createBeer(BeerDTO beerDto) {
+        Mono<Beer> savedBeer = beerRepository.save(beerMapper.beerDtoToBeer(beerDto));
+        
+        return null;
     }
 
     @Override
