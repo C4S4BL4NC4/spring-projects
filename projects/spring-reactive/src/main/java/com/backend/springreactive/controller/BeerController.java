@@ -4,6 +4,7 @@ import com.backend.springreactive.model.BeerDTO;
 import com.backend.springreactive.service.BeerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
@@ -30,12 +31,12 @@ public class BeerController {
     }
 
     @PostMapping(BEER_URL)
-    public Mono<BeerDTO> saveBeer(@RequestBody BeerDTO beerDto) {
+    public Mono<BeerDTO> saveBeer(@Validated @RequestBody BeerDTO beerDto) {
         return beerService.createBeer(beerDto);
     }
 
     @PutMapping(BEER_URL_ID)
-    public Mono<BeerDTO> updateBeer(@PathVariable Integer beerId, @RequestBody BeerDTO beerDto) {
+    public Mono<BeerDTO> updateBeer(@PathVariable Integer beerId, @Validated @RequestBody BeerDTO beerDto) {
         return beerService.updateBeer(beerId, beerDto)
                 .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)));
     }

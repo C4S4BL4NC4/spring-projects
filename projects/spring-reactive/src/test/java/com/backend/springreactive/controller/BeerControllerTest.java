@@ -29,6 +29,41 @@ class BeerControllerTest {
     }
 
     @Test
+    void createBeerBadData() {
+        BeerDTO beer = getNewBeerDto();
+        beer.setBeerName("");
+
+        webTestClient.post().uri(BEER_URL)
+                .bodyValue(beer)
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
+    @Test
+    void createBeerMissingPrice() {
+        BeerDTO beer = getNewBeerDto();
+        beer.setPrice(null);
+
+        webTestClient.post().uri(BEER_URL)
+                .bodyValue(beer)
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
+    @Test
+    void updateBeerBadData() {
+        BeerDTO savedBeer = createBeer();
+
+        BeerDTO update = getNewBeerDto();
+        update.setUpc("");
+
+        webTestClient.put().uri(BEER_URL_ID, savedBeer.getId())
+                .bodyValue(update)
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
+    @Test
     void updateBeer() {
         BeerDTO savedBeer = createBeer();
 
