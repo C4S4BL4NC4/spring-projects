@@ -1,7 +1,9 @@
 package com.java.springreactivemongo.bootstrap;
 
 import com.java.springreactivemongo.domain.Beer;
+import com.java.springreactivemongo.domain.Customer;
 import com.java.springreactivemongo.repository.BeerRepository;
+import com.java.springreactivemongo.repository.CustomerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -15,6 +17,7 @@ import java.time.LocalDateTime;
 public class BootstrapData implements CommandLineRunner {
 
     private final BeerRepository beerRepository;
+    private final CustomerRepository customerRepository;
 
     @Override
     public void run(String... args) throws Exception {
@@ -23,6 +26,41 @@ public class BootstrapData implements CommandLineRunner {
                     loadBeerData();
                 })
                 .subscribe();
+
+        customerRepository.deleteAll()
+                .doOnSuccess(success -> {
+                    loadCustomerData();
+                })
+                .subscribe();
+    }
+
+    private void loadCustomerData() {
+
+        customerRepository.count().subscribe(count -> {
+            if (count == 0) {
+                Customer customer1 = Customer.builder()
+                        .customerName("John Doe")
+                        .createdDate(LocalDateTime.now())
+                        .lastModifiedDate(LocalDateTime.now())
+                        .build();
+
+                Customer customer2 = Customer.builder()
+                        .customerName("Jane Smith")
+                        .createdDate(LocalDateTime.now())
+                        .lastModifiedDate(LocalDateTime.now())
+                        .build();
+
+                Customer customer3 = Customer.builder()
+                        .customerName("Bob Johnson")
+                        .createdDate(LocalDateTime.now())
+                        .lastModifiedDate(LocalDateTime.now())
+                        .build();
+
+                customerRepository.save(customer1).subscribe();
+                customerRepository.save(customer2).subscribe();
+                customerRepository.save(customer3).subscribe();
+            }
+        });
     }
 
     private void loadBeerData() {
