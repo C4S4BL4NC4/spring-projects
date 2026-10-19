@@ -13,7 +13,7 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequiredArgsConstructor
 public class CustomerController {
-    private static final String CUSTOMER_URL = "/api/v0/customers";
+    private static final String CUSTOMER_URL = "/api/v2/customers";
     private static final String CUSTOMER_URL_ID = CUSTOMER_URL + "/{customerId}";
 
     private final CustomerService customerService;

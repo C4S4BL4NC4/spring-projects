@@ -13,7 +13,7 @@ import static org.springframework.web.reactive.function.server.RouterFunctions.r
 @Configuration
 @RequiredArgsConstructor
 public class CustomerRouterConfig {
-    public static final String CUSTOMER_PATH = "/api/v0/customers";
+    public static final String CUSTOMER_PATH = "/api/v3/customers";
     public static final String CUSTOMER_ID_PATH = CUSTOMER_PATH + "/{customerId}";
 
     private final CustomerHandler customerHandler;
