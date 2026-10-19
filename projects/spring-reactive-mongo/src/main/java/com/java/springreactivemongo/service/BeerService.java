@@ -16,4 +16,8 @@ public interface BeerService {
     Mono<BeerDTO> patchBeer(String id, BeerDTO beerDto);
 
     Mono<Void> deleteBeerById(String id);
+
+    Mono<BeerDTO> findFirstByBeerName(String beerName);
+
+    Flux<BeerDTO> findAllByBeerStyle(String beerStyle);
 }
