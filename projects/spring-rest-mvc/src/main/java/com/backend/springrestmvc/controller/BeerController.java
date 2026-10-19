@@ -19,7 +19,7 @@ import java.util.UUID;
 @RestController     // Paired with @RequestBody for JSON returning purposes.
 //@Controller      // Can return any type of data used when to for example wanna render server sided HTML.
 public class BeerController {
-    public static final String BEERS_PATH = "/api/v1/beers";
+    public static final String BEERS_PATH = "/api/mvc/beers";
     public static final String BEERS_PATH_ID = BEERS_PATH + "/{beerId}";
 
     private final BeerService beerService;

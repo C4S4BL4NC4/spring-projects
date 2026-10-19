@@ -13,7 +13,7 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequiredArgsConstructor
 public class BeerController {
-    private static final String BEER_URL = "/api/v2/beers";
+    private static final String BEER_URL = "/api/reactive/beers";
     private static final String BEER_URL_ID = BEER_URL + "/{beerId}";
 
 

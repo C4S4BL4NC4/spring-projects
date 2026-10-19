@@ -13,7 +13,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @AutoConfigureWebTestClient
 class CustomerControllerTest {
 
-    private static final String CUSTOMER_URL = "/api/v2/customers";
+    private static final String CUSTOMER_URL = "/api/reactive/customers";
     private static final String CUSTOMER_URL_ID = CUSTOMER_URL + "/{customerId}";
 
     @Autowired

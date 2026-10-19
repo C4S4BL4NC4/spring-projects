@@ -7,15 +7,15 @@ spring:
             - id: spring-rest-mvc
               uri: http://localhost:8081
               predicates:
-                - Path=/api/v1/**
+                - Path=/api/mvc/**
             - id: spring-reactive
               uri: http://localhost:8082
               predicates:
-                - Path=/api/v2/**
+                - Path=/api/reactive/**
             - id: spring-reactive-mongo
               uri: http://localhost:8083
               predicates:
-                - Path=/api/v3/**
+                - Path=/api/reactive-mongo/**
             - id: spring-auth-server
               uri: http://localhost:9000
               predicates:

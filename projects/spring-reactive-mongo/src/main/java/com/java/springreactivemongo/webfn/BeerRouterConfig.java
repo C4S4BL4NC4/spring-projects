@@ -13,7 +13,7 @@ import static org.springframework.web.reactive.function.server.RouterFunctions.r
 @Configuration
 @RequiredArgsConstructor
 public class BeerRouterConfig {
-    public static final String BEER_PATH = "/api/v3/beers";
+    public static final String BEER_PATH = "/api/reactive-mongo/beers";
     public static final String BEER_ID_PATH = BEER_PATH + "/{beerId}";
 
     private final BeerHandler beerHandler;

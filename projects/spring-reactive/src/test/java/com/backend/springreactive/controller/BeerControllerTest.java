@@ -15,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @AutoConfigureWebTestClient
 class BeerControllerTest {
 
-    private static final String BEER_URL = "/api/v2/beers";
+    private static final String BEER_URL = "/api/reactive/beers";
     private static final String BEER_URL_ID = BEER_URL + "/{beerId}";
 
     @Autowired
