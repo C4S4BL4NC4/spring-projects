@@ -15,13 +15,14 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/api/mvc/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .anyRequest().authenticated())
                 // Validate bearer JWTs issued by the auth server (issuer-uri in properties)
                 .oauth2ResourceServer(oauth2ResourceServer -> oauth2ResourceServer
                         .jwt(Customizer.withDefaults()))
                 .csrf(csrf -> csrf
                         .ignoringRequestMatchers("/api/**"));
-        
+
         return http.build();
     }
 }
