@@ -25,3 +25,13 @@ spring:
               uri: http://localhost:9000
               predicates:
                 - Path=/oauth2/**, /.well-known/**
+management:
+  endpoint:
+    health:
+      probes:
+        enabled: true
+  health:
+    readinessstate:
+      enabled: true
+    livenessstate:
+      enabled: true
