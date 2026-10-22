@@ -5,9 +5,11 @@ import com.backend.springrestmvc.exception.NotFoundException;
 import com.backend.springrestmvc.mapper.CustomerMapper;
 import com.backend.springrestmvc.model.CustomerDTO;
 import com.backend.springrestmvc.repository.CustomerRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cache.CacheManager;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,7 +30,15 @@ class CustomerControllerIT {
 
     @Autowired
     CustomerMapper customerMapper;
-    
+
+    @Autowired
+    CacheManager cacheManager;
+
+    @BeforeEach
+    void setUp() {
+        // Tests change the database through the repository, bypassing cache eviction
+        cacheManager.getCacheNames().forEach(name -> cacheManager.getCache(name).clear());
+    }
 
     @Test
     void getAllCustomers() {

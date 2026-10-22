@@ -11,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cache.CacheManager;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -50,10 +51,15 @@ class BeerControllerIT {
     @Autowired
     ObjectMapper objectMapper;
 
+    @Autowired
+    CacheManager cacheManager;
+
     MockMvc mockMvc;
 
     @BeforeEach
     void setUp() {
+        // Tests change the database through the repository, bypassing cache eviction
+        cacheManager.getCacheNames().forEach(name -> cacheManager.getCache(name).clear());
 
         mockMvc = MockMvcBuilders.webAppContextSetup(wac)
                 .apply(springSecurity())
