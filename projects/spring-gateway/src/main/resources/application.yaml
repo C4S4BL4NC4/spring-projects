@@ -35,3 +35,8 @@ management:
       enabled: true
     livenessstate:
       enabled: true
+#Zalando Logbook:
+logging:
+  level:
+    com.java: debug
+    org.zalando: trace
