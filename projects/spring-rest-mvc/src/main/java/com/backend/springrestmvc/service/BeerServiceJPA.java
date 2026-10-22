@@ -6,6 +6,9 @@ import com.backend.springrestmvc.model.BeerDTO;
 import com.backend.springrestmvc.model.BeerStyle;
 import com.backend.springrestmvc.repository.BeerRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,6 +20,7 @@ import org.springframework.util.StringUtils;
 import java.util.Optional;
 import java.util.UUID;
 
+@Slf4j
 @Primary
 @Service
 @RequiredArgsConstructor
@@ -28,10 +32,13 @@ public class BeerServiceJPA implements BeerService {
 
     private final BeerRepository beerRepository;
     private final BeerMapper beerMapper;
+    private final ConcurrentMapCacheManager cacheManager;
 
+    @Cacheable(cacheNames = "beerListCache")
     @Override
     public Page<BeerDTO> listBeers(String beerName, BeerStyle beerStyle, Integer pageNumber, Integer pageSize) {
 
+        log.info("listBeers - in BeerServiceJPA");
 
         PageRequest pageRequest = buildPageRequest(pageNumber, pageSize);
 
@@ -51,6 +58,7 @@ public class BeerServiceJPA implements BeerService {
     }
 
 
+    @Cacheable(cacheNames = "beerCache", key = "#id")
     @Override
     public Optional<BeerDTO> getBeerById(UUID id) {
 
@@ -60,11 +68,14 @@ public class BeerServiceJPA implements BeerService {
 
     @Override
     public BeerDTO saveNewBeer(BeerDTO beerDTO) {
+        cacheManager.getCache("beerListCache").clear();
         return beerMapper.beerToBeerDTO(beerRepository.save(beerMapper.beerDTOToBeer(beerDTO)));
     }
 
     @Override
     public Optional<BeerDTO> updateBeer(UUID id, BeerDTO beerDTO) {
+        cacheManager.getCache("beerCache").evict(id);
+        cacheManager.getCache("beerListCache").clear();
         return beerRepository.findById(id).map(beer -> {
             beer.setBeerName(beerDTO.getBeerName());
             beer.setBeerStyle(beerDTO.getBeerStyle());
@@ -78,6 +89,8 @@ public class BeerServiceJPA implements BeerService {
     @Override
     public boolean deleteBeer(UUID id) {
         if (beerRepository.existsById(id)) {
+            cacheManager.getCache("beerCache").evict(id);
+            cacheManager.getCache("beerListCache").clear();
             beerRepository.deleteById(id);
             return true;
         }
