@@ -4,9 +4,8 @@ import com.backend.springrestmvc.mapper.CustomerMapper;
 import com.backend.springrestmvc.model.CustomerDTO;
 import com.backend.springrestmvc.repository.CustomerRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
+import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +21,7 @@ public class CustomerServiceJPA implements CustomerService {
 
     private final CustomerRepository customerRepository;
     private final CustomerMapper customerMapper;
+    private final ConcurrentMapCacheManager cacheManager;
 
     @Cacheable(cacheNames = "customerListCache")
     @Override
@@ -40,32 +40,28 @@ public class CustomerServiceJPA implements CustomerService {
                 .orElse(null)));
     }
 
-    @CacheEvict(cacheNames = "customerListCache", allEntries = true)
     @Override
     public CustomerDTO createCustomer(CustomerDTO customerDTO) {
+        cacheManager.getCache("customerListCache").clear();
         var customer = customerMapper.customerDTOToCustomer(customerDTO);
         return customerMapper.customerToCustomerDTO(customerRepository.save(customer));
     }
 
-    @Caching(evict = {
-            @CacheEvict(cacheNames = "customerCache", key = "#id"),
-            @CacheEvict(cacheNames = "customerListCache", allEntries = true)
-    })
     @Override
     public Optional<CustomerDTO> updateCustomer(UUID id, CustomerDTO customerDTO) {
+        cacheManager.getCache("customerCache").evict(id);
+        cacheManager.getCache("customerListCache").clear();
         return customerRepository.findById(id).map(customer -> {
             customer.setName(customerDTO.getName());
             return customerMapper.customerToCustomerDTO(customerRepository.save(customer));
         });
     }
 
-    @Caching(evict = {
-            @CacheEvict(cacheNames = "customerCache", key = "#id"),
-            @CacheEvict(cacheNames = "customerListCache", allEntries = true)
-    })
     @Override
     public boolean deleteCustomer(UUID id) {
         if (customerRepository.existsById(id)) {
+            cacheManager.getCache("customerCache").evict(id);
+            cacheManager.getCache("customerListCache").clear();
             customerRepository.deleteById(id);
             return true;
         }
