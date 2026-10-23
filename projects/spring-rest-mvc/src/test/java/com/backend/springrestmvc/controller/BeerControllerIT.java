@@ -2,11 +2,13 @@ package com.backend.springrestmvc.controller;
 
 import com.backend.springrestmvc.config.TestJwt;
 import com.backend.springrestmvc.entity.Beer;
+import com.backend.springrestmvc.event.BeerCreatedEvent;
 import com.backend.springrestmvc.exception.NotFoundException;
 import com.backend.springrestmvc.mapper.BeerMapper;
 import com.backend.springrestmvc.model.BeerDTO;
 import com.backend.springrestmvc.model.BeerStyle;
 import com.backend.springrestmvc.repository.BeerRepository;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +18,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.Rollback;
+import org.springframework.test.context.event.ApplicationEvents;
+import org.springframework.test.context.event.RecordApplicationEvents;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,8 +38,13 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@RecordApplicationEvents
 @SpringBootTest
 class BeerControllerIT {
+
+    @Autowired
+    ApplicationEvents applicationEvents;
+
     @Autowired
     BeerController beerController;
 
@@ -194,6 +203,9 @@ class BeerControllerIT {
         );
         var beer = beerRepository.findById(uuid);
         assertThat(beer).isNotNull();
+        Assertions.assertEquals(1, applicationEvents
+                .stream(BeerCreatedEvent.class)
+                .count());
     }
 
     @Rollback

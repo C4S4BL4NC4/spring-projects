@@ -1,6 +1,7 @@
 package com.backend.springrestmvc.service;
 
 import com.backend.springrestmvc.entity.Beer;
+import com.backend.springrestmvc.event.BeerCreatedEvent;
 import com.backend.springrestmvc.mapper.BeerMapper;
 import com.backend.springrestmvc.model.BeerDTO;
 import com.backend.springrestmvc.model.BeerStyle;
@@ -9,11 +10,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -33,6 +36,7 @@ public class BeerServiceJPA implements BeerService {
     private final BeerRepository beerRepository;
     private final BeerMapper beerMapper;
     private final ConcurrentMapCacheManager cacheManager;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Cacheable(cacheNames = "beerListCache")
     @Override
@@ -68,8 +72,14 @@ public class BeerServiceJPA implements BeerService {
 
     @Override
     public BeerDTO saveNewBeer(BeerDTO beerDTO) {
+
         cacheManager.getCache("beerListCache").clear();
-        return beerMapper.beerToBeerDTO(beerRepository.save(beerMapper.beerDTOToBeer(beerDTO)));
+
+        var savedBeer = beerRepository.save(beerMapper.beerDTOToBeer(beerDTO));
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+        applicationEventPublisher.publishEvent(new BeerCreatedEvent(savedBeer, auth));
+
+        return beerMapper.beerToBeerDTO(beerRepository.save(savedBeer));
     }
 
     @Override
