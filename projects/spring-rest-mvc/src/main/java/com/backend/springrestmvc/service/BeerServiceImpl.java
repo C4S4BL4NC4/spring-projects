@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -102,6 +103,32 @@ public class BeerServiceImpl implements BeerService {
         existing.setUpc(beerDTO.getUpc());
         existing.setQuantityOnHand(beerDTO.getQuantityOnHand());
         existing.setPrice(beerDTO.getPrice());
+        existing.setUpdatedAt(LocalDateTime.now());
+        return Optional.of(existing);
+    }
+
+    @Override
+    public Optional<BeerDTO> patchBeerById(UUID id, BeerDTO beerDTO) {
+        log.debug("patchBeerById() - in beer service, id = {}", id);
+        var existing = beerMap.get(id);
+        if (existing == null) {
+            return Optional.empty();
+        }
+        if (StringUtils.hasText(beerDTO.getBeerName())) {
+            existing.setBeerName(beerDTO.getBeerName());
+        }
+        if (beerDTO.getBeerStyle() != null) {
+            existing.setBeerStyle(beerDTO.getBeerStyle());
+        }
+        if (StringUtils.hasText(beerDTO.getUpc())) {
+            existing.setUpc(beerDTO.getUpc());
+        }
+        if (beerDTO.getQuantityOnHand() != null) {
+            existing.setQuantityOnHand(beerDTO.getQuantityOnHand());
+        }
+        if (beerDTO.getPrice() != null) {
+            existing.setPrice(beerDTO.getPrice());
+        }
         existing.setUpdatedAt(LocalDateTime.now());
         return Optional.of(existing);
     }

@@ -2,6 +2,9 @@ package com.backend.springrestmvc.service;
 
 import com.backend.springrestmvc.entity.Beer;
 import com.backend.springrestmvc.event.BeerCreatedEvent;
+import com.backend.springrestmvc.event.BeerDeletedEvent;
+import com.backend.springrestmvc.event.BeerPatchedEvent;
+import com.backend.springrestmvc.event.BeerUpdatedEvent;
 import com.backend.springrestmvc.mapper.BeerMapper;
 import com.backend.springrestmvc.model.BeerDTO;
 import com.backend.springrestmvc.model.BeerStyle;
@@ -92,19 +95,50 @@ public class BeerServiceJPA implements BeerService {
             beer.setQuantityOnHand(beerDTO.getQuantityOnHand());
             beer.setPrice(beerDTO.getPrice());
             beer.setUpc(beerDTO.getUpc());
-            return beerMapper.beerToBeerDTO(beerRepository.save(beer));
+            var savedBeer = beerRepository.save(beer);
+            var auth = SecurityContextHolder.getContext().getAuthentication();
+            applicationEventPublisher.publishEvent(new BeerUpdatedEvent(savedBeer, auth));
+            return beerMapper.beerToBeerDTO(savedBeer);
+        });
+    }
+
+    @Override
+    public Optional<BeerDTO> patchBeerById(UUID id, BeerDTO beerDTO) {
+        cacheManager.getCache("beerCache").evict(id);
+        cacheManager.getCache("beerListCache").clear();
+        return beerRepository.findById(id).map(beer -> {
+            if (StringUtils.hasText(beerDTO.getBeerName())) {
+                beer.setBeerName(beerDTO.getBeerName());
+            }
+            if (beerDTO.getBeerStyle() != null) {
+                beer.setBeerStyle(beerDTO.getBeerStyle());
+            }
+            if (beerDTO.getQuantityOnHand() != null) {
+                beer.setQuantityOnHand(beerDTO.getQuantityOnHand());
+            }
+            if (beerDTO.getPrice() != null) {
+                beer.setPrice(beerDTO.getPrice());
+            }
+            if (StringUtils.hasText(beerDTO.getUpc())) {
+                beer.setUpc(beerDTO.getUpc());
+            }
+            var savedBeer = beerRepository.save(beer);
+            var auth = SecurityContextHolder.getContext().getAuthentication();
+            applicationEventPublisher.publishEvent(new BeerPatchedEvent(savedBeer, auth));
+            return beerMapper.beerToBeerDTO(savedBeer);
         });
     }
 
     @Override
     public boolean deleteBeer(UUID id) {
-        if (beerRepository.existsById(id)) {
+        return beerRepository.findById(id).map(beer -> {
             cacheManager.getCache("beerCache").evict(id);
             cacheManager.getCache("beerListCache").clear();
-            beerRepository.deleteById(id);
+            beerRepository.delete(beer);
+            var auth = SecurityContextHolder.getContext().getAuthentication();
+            applicationEventPublisher.publishEvent(new BeerDeletedEvent(beer, auth));
             return true;
-        }
-        return false;
+        }).orElse(false);
     }
 
     // Filtering Helper Methods

@@ -3,6 +3,9 @@ package com.backend.springrestmvc.controller;
 import com.backend.springrestmvc.config.TestJwt;
 import com.backend.springrestmvc.entity.Beer;
 import com.backend.springrestmvc.event.BeerCreatedEvent;
+import com.backend.springrestmvc.event.BeerDeletedEvent;
+import com.backend.springrestmvc.event.BeerPatchedEvent;
+import com.backend.springrestmvc.event.BeerUpdatedEvent;
 import com.backend.springrestmvc.exception.NotFoundException;
 import com.backend.springrestmvc.mapper.BeerMapper;
 import com.backend.springrestmvc.model.BeerDTO;
@@ -217,6 +220,31 @@ class BeerControllerIT {
         var responseEntity = beerController.updateBeer(beer.getId(), dto);
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
         assertThat(beer.getBeerName()).isEqualTo("Budweiser");
+        Assertions.assertEquals(1, applicationEvents
+                .stream(BeerUpdatedEvent.class)
+                .count());
+    }
+
+    @Rollback
+    @Transactional
+    @Test
+    void patchBeer() {
+        var beer = beerRepository.findAll().getFirst();
+        var originalStyle = beer.getBeerStyle();
+        var dto = BeerDTO.builder().beerName("Patched").build();
+        var responseEntity = beerController.patchBeerById(beer.getId(), dto);
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+        assertThat(beer.getBeerName()).isEqualTo("Patched");
+        assertThat(beer.getBeerStyle()).isEqualTo(originalStyle);
+        Assertions.assertEquals(1, applicationEvents
+                .stream(BeerPatchedEvent.class)
+                .count());
+    }
+
+    @Test
+    void patchBeerNotFound() {
+        var dto = BeerDTO.builder().beerName("Patched").build();
+        assertThrows(NotFoundException.class, () -> beerController.patchBeerById(UUID.randomUUID(), dto));
     }
 
     @Test
@@ -237,6 +265,9 @@ class BeerControllerIT {
         var responseEntity = beerController.deleteBeer(beer.getId());
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
         assertThat(beerRepository.findById(beer.getId())).isEmpty();
+        Assertions.assertEquals(1, applicationEvents
+                .stream(BeerDeletedEvent.class)
+                .count());
     }
 
     @Test
