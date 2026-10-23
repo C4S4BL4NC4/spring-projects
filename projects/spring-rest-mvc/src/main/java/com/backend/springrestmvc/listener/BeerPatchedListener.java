@@ -1,10 +1,6 @@
 package com.backend.springrestmvc.listener;
 
-import com.backend.springrestmvc.event.BeerCreatedEvent;
-import com.backend.springrestmvc.event.BeerDeletedEvent;
-import com.backend.springrestmvc.event.BeerEvent;
 import com.backend.springrestmvc.event.BeerPatchedEvent;
-import com.backend.springrestmvc.event.BeerUpdatedEvent;
 import com.backend.springrestmvc.mapper.BeerMapper;
 import com.backend.springrestmvc.repository.BeerAuditRepsitory;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +12,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @RequiredArgsConstructor
 @Component
-public class BeerEventListener {
+public class BeerPatchedListener {
 
     private final BeerMapper beerMapper;
 
@@ -24,23 +20,15 @@ public class BeerEventListener {
 
     @Async
     @EventListener
-    public void listen(BeerEvent event) {
+    public void listen(BeerPatchedEvent event) {
         var beerAudit = beerMapper.beerToBeerAudit(event.getBeer());
-
-        String eventType = switch (event) {
-            case BeerCreatedEvent e -> "BEER_CREATED";
-            case BeerUpdatedEvent e -> "BEER_PUT";
-            case BeerPatchedEvent e -> "BEER_PATCH";
-            case BeerDeletedEvent e -> "BEER_DELETE";
-            default -> "UNKNOWN";
-        };
-        beerAudit.setAuditEventType(eventType);
+        beerAudit.setAuditEventType("BEER_PATCH");
 
         if (event.getAuthentication() != null && event.getAuthentication().getName() != null) {
             beerAudit.setPrincipalName(event.getAuthentication().getName());
         }
 
         var savedBeerAudit = beerAuditRepsitory.save(beerAudit);
-        log.debug("Beer Audit Created: {} - {}", eventType, savedBeerAudit.getId());
+        log.debug("Beer Audit Patched: {}", savedBeerAudit.getId());
     }
 }
