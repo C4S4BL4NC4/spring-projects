@@ -18,7 +18,7 @@ public interface BeerMapper {
     @Mapping(target = "createdAt", source = "createdDate")
     @Mapping(target = "updatedAt", source = "updateDate")
     BeerDTO beerToBeerDTO(Beer beer);
-
+    
     @Mapping(target = "createdDateAudit", ignore = true)
     @Mapping(target = "auditId", ignore = true)
     @Mapping(target = "auditEventType", ignore = true)

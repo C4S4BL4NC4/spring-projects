@@ -1,5 +1,6 @@
 package com.backend.springrestmvc.service;
 
+import com.backend.springrestmvc.entity.Customer;
 import com.backend.springrestmvc.model.CustomerDTO;
 import com.backend.springrestmvc.repository.CustomerRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -89,6 +90,12 @@ class CustomerServiceJPACacheTest {
     @Transactional
     @Test
     void deleteCustomerEvictsCustomerAndClearsListCache() {
+        // bootstrapped customers have orders, so delete one without orders
+        UUID customerId = customerRepository.save(Customer.builder()
+                .name("Delete Me")
+                .build()).getId();
+        clearInvocations(customerRepository);
+
         customerService.getCustomerById(customerId);
         var before = customerService.getAllCustomers();
 

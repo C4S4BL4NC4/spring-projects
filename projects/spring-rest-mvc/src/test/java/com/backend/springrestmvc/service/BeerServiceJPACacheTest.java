@@ -1,5 +1,6 @@
 package com.backend.springrestmvc.service;
 
+import com.backend.springrestmvc.entity.Beer;
 import com.backend.springrestmvc.model.BeerDTO;
 import com.backend.springrestmvc.model.BeerStyle;
 import com.backend.springrestmvc.repository.BeerRepository;
@@ -114,6 +115,15 @@ class BeerServiceJPACacheTest {
     @Transactional
     @Test
     void deleteBeerEvictsBeerAndClearsListCache() {
+        // bootstrapped beers may be referenced by order lines, so delete one without orders
+        UUID beerId = beerRepository.save(Beer.builder()
+                .beerName("Delete Me")
+                .beerStyle(BeerStyle.IPA)
+                .upc("999999")
+                .price(BigDecimal.TEN)
+                .build()).getId();
+        clearInvocations(beerRepository);
+
         beerService.getBeerById(beerId);
         beerService.listBeers(null, null, 1, 25);
 

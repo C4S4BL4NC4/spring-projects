@@ -1,8 +1,12 @@
 package com.backend.springrestmvc.bootstrap;
 
 import com.backend.springrestmvc.entity.Beer;
+import com.backend.springrestmvc.entity.BeerOrder;
+import com.backend.springrestmvc.entity.BeerOrderLine;
+import com.backend.springrestmvc.entity.BeerOrderShipment;
 import com.backend.springrestmvc.entity.Customer;
 import com.backend.springrestmvc.model.BeerStyle;
+import com.backend.springrestmvc.repository.BeerOrderRepository;
 import com.backend.springrestmvc.repository.BeerRepository;
 import com.backend.springrestmvc.repository.CustomerRepository;
 import com.backend.springrestmvc.service.BeerCsvService;
@@ -15,6 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.File;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Component
 @RequiredArgsConstructor
@@ -22,6 +28,7 @@ public class BootstrapData implements CommandLineRunner {
 
     private final BeerRepository beerRepository;
     private final CustomerRepository customerRepository;
+    private final BeerOrderRepository beerOrderRepository;
     private final BeerCsvService beerCsvService;
 
     @Transactional
@@ -30,6 +37,7 @@ public class BootstrapData implements CommandLineRunner {
         loadBeerData();
         loadCsvData();
         loadCustomerData();
+        loadBeerOrderData();
     }
 
     private void loadCsvData() {
@@ -115,6 +123,31 @@ public class BootstrapData implements CommandLineRunner {
             customerRepository.save(riki);
             customerRepository.save(ibra);
             customerRepository.save(carm);
+        }
+    }
+
+    private void loadBeerOrderData() {
+
+        if (beerOrderRepository.count() == 0) {
+            var customers = customerRepository.findAll();
+            var beerIterator = beerRepository.findAll().iterator();
+
+            customers.forEach(customer -> beerOrderRepository.save(BeerOrder.builder()
+                    .customer(customer)
+                    .customerRef(customer.getName() + " order")
+                    .beerOrderLines(new HashSet<>(Set.of(
+                            BeerOrderLine.builder()
+                                    .beer(beerIterator.next())
+                                    .orderQuantity(1)
+                                    .build(),
+                            BeerOrderLine.builder()
+                                    .beer(beerIterator.next())
+                                    .orderQuantity(2)
+                                    .build())))
+                    .beerOrderShipment(BeerOrderShipment.builder()
+                            .trackingNumber("TRACK-" + customer.getName().hashCode())
+                            .build())
+                    .build()));
         }
     }
 

@@ -4,6 +4,7 @@ import com.backend.springrestmvc.entity.Customer;
 import com.backend.springrestmvc.exception.NotFoundException;
 import com.backend.springrestmvc.mapper.CustomerMapper;
 import com.backend.springrestmvc.model.CustomerDTO;
+import com.backend.springrestmvc.repository.BeerOrderRepository;
 import com.backend.springrestmvc.repository.CustomerRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,6 +28,9 @@ class CustomerControllerIT {
 
     @Autowired
     CustomerRepository customerRepository;
+
+    @Autowired
+    BeerOrderRepository beerOrderRepository;
 
     @Autowired
     CustomerMapper customerMapper;
@@ -62,6 +66,7 @@ class CustomerControllerIT {
     @Transactional
     @Test
     void emptyList() {
+        beerOrderRepository.deleteAll();
         customerRepository.deleteAll();
         var dtos = customerController.getAllCustomers();
         assertThat(dtos.size()).isEqualTo(0);

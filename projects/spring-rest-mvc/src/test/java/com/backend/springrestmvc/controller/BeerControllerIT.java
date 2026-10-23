@@ -10,6 +10,7 @@ import com.backend.springrestmvc.exception.NotFoundException;
 import com.backend.springrestmvc.mapper.BeerMapper;
 import com.backend.springrestmvc.model.BeerDTO;
 import com.backend.springrestmvc.model.BeerStyle;
+import com.backend.springrestmvc.repository.BeerOrderRepository;
 import com.backend.springrestmvc.repository.BeerRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -53,6 +54,9 @@ class BeerControllerIT {
 
     @Autowired
     BeerRepository beerRepository;
+
+    @Autowired
+    BeerOrderRepository beerOrderRepository;
 
     @Autowired
     BeerMapper beerMapper;
@@ -184,6 +188,7 @@ class BeerControllerIT {
     @Transactional
     @Test
     void emptyList() {
+        beerOrderRepository.deleteAll();
         beerRepository.deleteAll();
         var dtos = beerController.listBeers(null, null, 1, 25);
         assertThat(dtos.getTotalElements()).isEqualTo(0);

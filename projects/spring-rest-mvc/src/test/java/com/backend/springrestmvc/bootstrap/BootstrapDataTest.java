@@ -1,5 +1,6 @@
 package com.backend.springrestmvc.bootstrap;
 
+import com.backend.springrestmvc.repository.BeerOrderRepository;
 import com.backend.springrestmvc.repository.BeerRepository;
 import com.backend.springrestmvc.repository.CustomerRepository;
 import com.backend.springrestmvc.service.BeerCsvService;
@@ -23,13 +24,16 @@ class BootstrapDataTest {
     CustomerRepository customerRepository;
 
     @Autowired
+    BeerOrderRepository beerOrderRepository;
+
+    @Autowired
     BeerCsvService beerCsvService;
 
     BootstrapData bootstrapData;
 
     @BeforeEach
     void setUp() {
-        bootstrapData = new BootstrapData(beerRepository, customerRepository, beerCsvService);
+        bootstrapData = new BootstrapData(beerRepository, customerRepository, beerOrderRepository, beerCsvService);
     }
 
     @Test
@@ -38,5 +42,6 @@ class BootstrapDataTest {
 
         assertThat(beerRepository.count()).isEqualTo(2413);
         assertThat(customerRepository.count()).isEqualTo(3);
+        assertThat(beerOrderRepository.count()).isEqualTo(3);
     }
 }
